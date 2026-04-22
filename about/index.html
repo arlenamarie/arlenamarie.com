@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABOUT — Arlena Marie</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; background:#f5f1e8; }
+  body {
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    font-family:'Caveat',cursive; color:#1a1209;
+    text-align:center; padding:2rem;
+  }
+  .page-name {
+    font-family:'Caveat Brush',cursive;
+    font-size:clamp(40px,10vw,72px);
+    line-height:1.1; margin-bottom:0.5rem;
+  }
+  .page-name span {
+    display:inline-block;
+    animation:wiggle 2.4s ease-in-out infinite;
+    animation-delay:var(--d,0s);
+  }
+  @keyframes wiggle {
+    0%,100%{transform:rotate(-5deg) translateY(0)}
+    50%{transform:rotate(5deg) translateY(-3px)}
+  }
+  .tagline {
+    font-size:clamp(18px,4vw,28px);
+    opacity:0.75; margin-bottom:2rem;
+  }
+  .back {
+    font-size:clamp(16px,3vw,20px);
+    color:#1a1209; text-decoration:none;
+    opacity:0.6; transition:opacity 0.2s;
+  }
+  .back:hover { opacity:1; }
+
+  /* Star orbit (simplified) */
+  .orbit-wrap {
+    position:fixed; top:50%; left:50%;
+    pointer-events:none; z-index:0;
+  }
+  .orbit-spin { animation:spin 55s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .s-star {
+    position:absolute;
+    animation:unspin 55s linear infinite;
+  }
+  @keyframes unspin { to{transform:rotate(-360deg)} }
+  .content { position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<div class="orbit-wrap"><div class="orbit-spin" id="orbit"></div></div>
+
+<div class="content">
+  <div class="page-name" id="pageName"></div>
+  <p class="tagline">I'll tell you soon.</p>
+  <a href="/" class="back">← back home</a>
+</div>
+
+<script>
+// Wiggling page name
+const name = "ABOUT";
+const el = document.getElementById('pageName');
+name.split('').forEach((ch,i) => {
+  if(ch===' '){const s=document.createElement('span');s.innerHTML='&nbsp;';s.style.width='0.3em';el.appendChild(s);return;}
+  const s = document.createElement('span');
+  s.textContent = ch;
+  s.style.setProperty('--d', i*0.13+'s');
+  el.appendChild(s);
+});
+
+// Mini star orbit
+const colors = ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'];
+const ring = document.getElementById('orbit');
+for(let i=0;i<8;i++){
+  const a = Math.PI*2/8*i;
+  const rx = Math.min(window.innerWidth,window.innerHeight)*0.35;
+  const ry = rx*0.85;
+  const sz = 14 + ((i*37)%100)/100*22;
+  const d = document.createElement('div');
+  d.className='s-star';
+  d.style.left = (rx*Math.cos(a)-sz/2)+'px';
+  d.style.top  = (ry*Math.sin(a)-sz/2)+'px';
+  const pts=[];
+  for(let j=0;j<10;j++){const r=j%2===0?45:18;const ang=Math.PI/5*j-Math.PI/2;pts.push((50+r*Math.cos(ang))+','+(50+r*Math.sin(ang)));}
+  d.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100"><polygon points="'+pts.join(' ')+'" fill="'+colors[i%6]+'" stroke="#1a1209" stroke-width="2.5" stroke-linejoin="round"/></svg>';
+  ring.appendChild(d);
+}
+</script>
+</body>
+</html>
