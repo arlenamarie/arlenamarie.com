@@ -2,97 +2,295 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FOLLOW — Arlena Marie</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Follow — Arlena Marie</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; background:#f5f1e8; }
-  body {
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    font-family:'Caveat',cursive; color:#1a1209;
-    text-align:center; padding:2rem;
-  }
-  .page-name {
-    font-family:'Caveat Brush',cursive;
-    font-size:clamp(40px,10vw,72px);
-    line-height:1.1; margin-bottom:0.5rem;
-  }
-  .page-name span {
-    display:inline-block;
-    animation:wiggle 2.4s ease-in-out infinite;
-    animation-delay:var(--d,0s);
-  }
-  @keyframes wiggle {
-    0%,100%{transform:rotate(-5deg) translateY(0)}
-    50%{transform:rotate(5deg) translateY(-3px)}
-  }
-  .tagline {
-    font-size:clamp(18px,4vw,28px);
-    opacity:0.75; margin-bottom:2rem;
-  }
-  .back {
-    font-size:clamp(16px,3vw,20px);
-    color:#1a1209; text-decoration:none;
-    opacity:0.6; transition:opacity 0.2s;
-  }
-  .back:hover { opacity:1; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* Star orbit (simplified) */
-  .orbit-wrap {
-    position:fixed; top:50%; left:50%;
-    pointer-events:none; z-index:0;
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #f9e4e8;
   }
-  .orbit-spin { animation:spin 55s linear infinite; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .s-star {
-    position:absolute;
-    animation:unspin 55s linear infinite;
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+    position: relative;
   }
-  @keyframes unspin { to{transform:rotate(-360deg)} }
-  .content { position:relative; z-index:1; }
+
+  /* ── Center content ── */
+  .center-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── Glowing Name ── */
+  .glow-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.03em;
+    font-family: 'Caveat Brush', cursive;
+    font-size: clamp(48px, 12vmin, 96px);
+    color: #1a1209;
+    line-height: 1;
+  }
+
+  .glow-letter {
+    display: inline-block;
+    animation:
+      wiggle var(--spd, 3s) ease-in-out infinite,
+      glow var(--spd, 3s) ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    50%      { transform: rotate(4deg) translateY(-3px); }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      text-shadow:
+        0 0 6px #ff6b9d,
+        0 0 12px #ff6b9d,
+        0 0 18px #ff6b9d;
+    }
+    50% {
+      text-shadow:
+        0 0 12px #ff6b9d,
+        0 0 24px #ff6b9d,
+        0 0 40px #ff6b9d,
+        0 0 60px #ff6b9d55;
+    }
+  }
+
+  .tagline {
+    font-size: clamp(18px, 4vmin, 28px);
+    color: #1a1209;
+    opacity: 0.65;
+    margin-top: 12px;
+  }
+
+  /* ── Heart Orbit ── */
+  .heart-anchor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .heart-ring {
+    animation: spin 55s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .heart-item {
+    position: absolute;
+    animation: unspin 55s linear infinite;
+  }
+
+  @keyframes unspin { to { transform: rotate(-360deg); } }
+
+  /* ── Floating social icons ── */
+  .floater {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .floater:hover {
+    transform: scale(1.25);
+  }
+
+  .floater-icon {
+    width: clamp(50px, 10vmin, 90px);
+    height: clamp(50px, 10vmin, 90px);
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.12));
+  }
+
+  .floater-handle {
+    margin-top: 4px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(11px, 2vmin, 16px);
+    color: #1a1209;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  /* Drift wrappers — each icon drifts on its own path */
+  .floater-drift {
+    position: fixed;
+    z-index: 20;
+  }
+
+  /* Pause ALL animation on hover so you can catch it */
+  .floater-drift:hover {
+    animation-play-state: paused !important;
+  }
+
+  /* Each icon gets unique X and Y animations with mismatched durations
+     to create lissajous-like organic non-repeating paths */
+
+  .drift-1 {
+    animation: dX1 21s ease-in-out infinite alternate, dY1 27s ease-in-out infinite alternate;
+  }
+  .drift-2 {
+    animation: dX2 25s ease-in-out infinite alternate, dY2 19s ease-in-out infinite alternate;
+  }
+  .drift-3 {
+    animation: dX3 29s ease-in-out infinite alternate, dY3 22s ease-in-out infinite alternate;
+  }
+  .drift-4 {
+    animation: dX4 20s ease-in-out infinite alternate, dY4 28s ease-in-out infinite alternate;
+  }
+
+  @keyframes dX1 { 0% { left: 5%;  } 100% { left: 70%; } }
+  @keyframes dY1 { 0% { top: 8%;   } 100% { top: 65%; } }
+
+  @keyframes dX2 { 0% { left: 68%; } 100% { left: 8%;  } }
+  @keyframes dY2 { 0% { top: 55%;  } 100% { top: 10%; } }
+
+  @keyframes dX3 { 0% { left: 10%; } 100% { left: 60%; } }
+  @keyframes dY3 { 0% { top: 60%;  } 100% { top: 18%; } }
+
+  @keyframes dX4 { 0% { left: 55%; } 100% { left: 3%;  } }
+  @keyframes dY4 { 0% { top: 5%;   } 100% { top: 72%; } }
+
+  /* ── Back link ── */
+  .back-link {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: clamp(16px, 3vmin, 20px);
+    color: #1a1209;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 30;
+  }
+
+  .back-link:hover { opacity: 1; }
+
+  /* ── Mobile ── */
+  @media (max-width: 480px) {
+    .floater-icon {
+      width: clamp(45px, 14vw, 70px);
+      height: clamp(45px, 14vw, 70px);
+    }
+    .glow-row { font-size: clamp(40px, 14vw, 72px); }
+  }
 </style>
 </head>
 <body>
 
-<div class="orbit-wrap"><div class="orbit-spin" id="orbit"></div></div>
+  <!-- ═══ HEART ORBIT ═══ -->
+  <div class="heart-anchor">
+    <div class="heart-ring" id="heartRing"></div>
+  </div>
 
-<div class="content">
-  <div class="page-name" id="pageName"></div>
-  <p class="tagline">find me everywhere</p>
-  <a href="/" class="back">← back home</a>
-</div>
+  <!-- ═══ CENTER: GLOWING NAME + TAGLINE ═══ -->
+  <div class="center-content">
+    <div class="glow-row" id="glowName"></div>
+    <p class="tagline">find me everywhere</p>
+  </div>
+
+  <!-- ═══ FLOATING SOCIAL ICONS ═══ -->
+
+  <div class="floater-drift drift-1">
+    <a href="https://instagram.com/arlenamarie" target="_blank" rel="noopener" class="floater">
+      <img src="/images/instagram_1.png" class="floater-icon" alt="Instagram">
+      <span class="floater-handle">@arlenamarie</span>
+    </a>
+  </div>
+
+  <div class="floater-drift drift-2">
+    <a href="https://instagram.com/puppetgarbage" target="_blank" rel="noopener" class="floater">
+      <img src="/images/instagram_1.png" class="floater-icon" alt="Instagram">
+      <span class="floater-handle">@puppetgarbage</span>
+    </a>
+  </div>
+
+  <div class="floater-drift drift-3">
+    <a href="https://instagram.com/theneverendinghero" target="_blank" rel="noopener" class="floater">
+      <img src="/images/instagram_1.png" class="floater-icon" alt="Instagram">
+      <span class="floater-handle">@theneverendinghero</span>
+    </a>
+  </div>
+
+  <div class="floater-drift drift-4">
+    <a href="https://youtube.com/@arlena-marie" target="_blank" rel="noopener" class="floater">
+      <img src="/images/youtube_1.png" class="floater-icon" alt="YouTube">
+      <span class="floater-handle">@arlena-marie</span>
+    </a>
+  </div>
+
+  <!-- ═══ BACK LINK ═══ -->
+  <a href="/" class="back-link">&larr; back home</a>
 
 <script>
-// Wiggling page name
-const name = "FOLLOW";
-const el = document.getElementById('pageName');
-name.split('').forEach((ch,i) => {
-  if(ch===' '){const s=document.createElement('span');s.innerHTML='&nbsp;';s.style.width='0.3em';el.appendChild(s);return;}
+/* ── Glowing Wiggling Letters ── */
+const name = 'FOLLOW';
+const el = document.getElementById('glowName');
+name.split('').forEach((ch, i) => {
   const s = document.createElement('span');
+  s.className = 'glow-letter';
   s.textContent = ch;
-  s.style.setProperty('--d', i*0.13+'s');
+  s.style.setProperty('--d', `${i * 0.15}s`);
+  s.style.setProperty('--spd', '3s');
   el.appendChild(s);
 });
 
-// Mini star orbit
-const colors = ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'];
-const ring = document.getElementById('orbit');
-for(let i=0;i<8;i++){
-  const a = Math.PI*2/8*i;
-  const rx = Math.min(window.innerWidth,window.innerHeight)*0.35;
-  const ry = rx*0.85;
-  const sz = 14 + ((i*37)%100)/100*22;
+/* ── Heart Orbit ── */
+const heartColors = ['#ff6b9d','#f4b6c2','#ffb3c6','#c9184a','#ffccd5','#ff8fab'];
+const ring = document.getElementById('heartRing');
+const heartCount = 10;
+
+function heartSVG(sz, fill, stroke, sw) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', sz); svg.setAttribute('height', sz);
+  svg.setAttribute('viewBox', '0 0 100 100');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M50,82 C50,82 15,60 15,35 C15,22 25,15 35,15 C42,15 47,18 50,25 C53,18 58,15 65,15 C75,15 85,22 85,35 C85,60 50,82 50,82 Z');
+  path.setAttribute('fill', fill);
+  path.setAttribute('stroke', stroke);
+  path.setAttribute('stroke-width', sw);
+  path.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(path);
+  return svg;
+}
+
+for (let i = 0; i < heartCount; i++) {
+  const ang = (Math.PI * 2 / heartCount) * i;
+  const rx = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+  const ry = rx * 0.8;
+  const sz = 14 + ((i * 37) % 100) / 100 * 26;
+  const col = heartColors[i % heartColors.length];
+
   const d = document.createElement('div');
-  d.className='s-star';
-  d.style.left = (rx*Math.cos(a)-sz/2)+'px';
-  d.style.top  = (ry*Math.sin(a)-sz/2)+'px';
-  const pts=[];
-  for(let j=0;j<10;j++){const r=j%2===0?45:18;const ang=Math.PI/5*j-Math.PI/2;pts.push((50+r*Math.cos(ang))+','+(50+r*Math.sin(ang)));}
-  d.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100"><polygon points="'+pts.join(' ')+'" fill="'+colors[i%6]+'" stroke="#1a1209" stroke-width="2.5" stroke-linejoin="round"/></svg>';
+  d.className = 'heart-item';
+  d.style.left = `${rx * Math.cos(ang) - sz / 2}px`;
+  d.style.top  = `${ry * Math.sin(ang) - sz / 2}px`;
+  d.appendChild(heartSVG(sz, col, '#1a1209', 2.5));
   ring.appendChild(d);
 }
 </script>
+
 </body>
 </html>
