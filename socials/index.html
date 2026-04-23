@@ -195,6 +195,11 @@
     }
     .glow-row { font-size: clamp(40px, 14vw, 72px); }
   }
+ .drift-5 {
+  animation: dX5 23s ease-in-out infinite alternate, dY5 18s ease-in-out infinite alternate;
+}
+@keyframes dX5 { 0% { left: 45%; } 100% { left: 6%; } }
+@keyframes dY5 { 0% { top: 10%; } 100% { top: 70%; } }
 </style>
 </head>
 <body>
