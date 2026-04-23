@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Only Fans — Arlena Marie</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #f5f1e8;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+    position: relative;
+  }
+
+  .punchline {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    user-select: none;
+  }
+
+  .punchline h1 {
+    font-family: 'Caveat Brush', cursive;
+    font-size: clamp(48px, 14vmin, 120px);
+    color: #1a1209;
+    line-height: 1;
+    animation: sway 4s ease-in-out infinite;
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+  }
+
+  .punchline p {
+    font-size: clamp(18px, 4vmin, 32px);
+    color: #1a1209;
+    opacity: 0.6;
+    margin-top: 8px;
+  }
+
+  .fan {
+    position: fixed;
+    z-index: 5;
+  }
+
+  .fan img {
+    width: clamp(80px, 18vmin, 180px);
+    height: clamp(80px, 18vmin, 180px);
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+    animation: fanWobble 0.15s ease-in-out infinite alternate;
+  }
+
+  .fan-1 { bottom: 5%;  left: 5%;   transform: rotate(-10deg); }
+  .fan-2 { bottom: 5%;  right: 5%;  transform: rotate(15deg) scaleX(-1); }
+  .fan-3 { top: 8%;     left: 8%;   transform: rotate(-20deg); }
+  .fan-4 { top: 8%;     right: 8%;  transform: rotate(10deg) scaleX(-1); }
+  .fan-5 { top: 40%;    left: 3%;   transform: rotate(-5deg); }
+  .fan-6 { top: 40%;    right: 3%;  transform: rotate(8deg) scaleX(-1); }
+
+  .fan-1 img { animation-delay: 0s; }
+  .fan-2 img { animation-delay: 0.03s; }
+  .fan-3 img { animation-delay: 0.06s; }
+  .fan-4 img { animation-delay: 0.09s; }
+  .fan-5 img { animation-delay: 0.04s; }
+  .fan-6 img { animation-delay: 0.07s; }
+
+  @keyframes fanWobble {
+    0%   { transform: rotate(-1.5deg) scale(1); }
+    100% { transform: rotate(1.5deg) scale(1.01); }
+  }
+
+  .debris {
+    position: fixed;
+    z-index: 4;
+    pointer-events: none;
+    font-size: clamp(16px, 4vmin, 36px);
+    opacity: 0.7;
+  }
+
+  .blow-1 { animation: blowAcross1 8s linear infinite; }
+  .blow-2 { animation: blowAcross2 11s linear infinite; animation-delay: -3s; }
+  .blow-3 { animation: blowAcross3 7s linear infinite; animation-delay: -5s; }
+  .blow-4 { animation: blowAcross4 13s linear infinite; animation-delay: -1s; }
+  .blow-5 { animation: blowAcross5 9s linear infinite; animation-delay: -7s; }
+  .blow-6 { animation: blowAcross6 10s linear infinite; animation-delay: -4s; }
+  .blow-7 { animation: blowAcross7 6s linear infinite; animation-delay: -2s; }
+  .blow-8 { animation: blowAcross8 12s linear infinite; animation-delay: -6s; }
+
+  @keyframes blowAcross1 {
+    0%   { left: -10%; top: 20%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.7; }
+    100% { left: 110%; top: 25%; transform: rotate(720deg); opacity: 0; }
+  }
+  @keyframes blowAcross2 {
+    0%   { left: 110%; top: 40%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.6; }
+    100% { left: -10%; top: 35%; transform: rotate(-540deg); opacity: 0; }
+  }
+  @keyframes blowAcross3 {
+    0%   { left: -10%; top: 60%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.8; }
+    100% { left: 110%; top: 55%; transform: rotate(900deg); opacity: 0; }
+  }
+  @keyframes blowAcross4 {
+    0%   { left: 110%; top: 75%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.5; }
+    100% { left: -10%; top: 80%; transform: rotate(-360deg); opacity: 0; }
+  }
+  @keyframes blowAcross5 {
+    0%   { left: -10%; top: 10%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.6; }
+    100% { left: 110%; top: 15%; transform: rotate(450deg); opacity: 0; }
+  }
+  @keyframes blowAcross6 {
+    0%   { left: 110%; top: 50%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.7; }
+    100% { left: -10%; top: 45%; transform: rotate(-630deg); opacity: 0; }
+  }
+  @keyframes blowAcross7 {
+    0%   { left: -10%; top: 85%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.5; }
+    100% { left: 110%; top: 70%; transform: rotate(810deg); opacity: 0; }
+  }
+  @keyframes blowAcross8 {
+    0%   { left: 110%; top: 30%; transform: rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.6; }
+    100% { left: -10%; top: 28%; transform: rotate(-480deg); opacity: 0; }
+  }
+
+  .wind-particle {
+    position: fixed;
+    width: clamp(30px, 8vw, 80px);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(26,18,9,0.12), transparent);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .wp-1 { animation: windLine1 3s linear infinite; }
+  .wp-2 { animation: windLine2 4s linear infinite; animation-delay: -1s; }
+  .wp-3 { animation: windLine3 2.5s linear infinite; animation-delay: -2s; }
+  .wp-4 { animation: windLine4 3.5s linear infinite; animation-delay: -0.5s; }
+  .wp-5 { animation: windLine5 4.5s linear infinite; animation-delay: -3s; }
+  .wp-6 { animation: windLine6 2.8s linear infinite; animation-delay: -1.5s; }
+
+  @keyframes windLine1 { 0% { left:-10%; top:30%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:110%; top:32%; opacity:0; } }
+  @keyframes windLine2 { 0% { left:110%; top:55%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:-10%; top:53%; opacity:0; } }
+  @keyframes windLine3 { 0% { left:-10%; top:70%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:110%; top:68%; opacity:0; } }
+  @keyframes windLine4 { 0% { left:110%; top:20%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:-10%; top:22%; opacity:0; } }
+  @keyframes windLine5 { 0% { left:-10%; top:45%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:110%; top:47%; opacity:0; } }
+  @keyframes windLine6 { 0% { left:110%; top:82%; opacity:0; } 20% { opacity:1; } 80% { opacity:1; } 100% { left:-10%; top:80%; opacity:0; } }
+
+  .back-link {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: clamp(16px, 3vmin, 20px);
+    color: #1a1209;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 30;
+  }
+
+  .back-link:hover { opacity: 1; }
+
+  .punchline h1 span {
+    display: inline-block;
+    animation: letterBlow 2s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes letterBlow {
+    0%, 100% { transform: translateX(0) skewX(0deg); }
+    25% { transform: translateX(3px) skewX(2deg); }
+    75% { transform: translateX(-2px) skewX(-1deg); }
+  }
+</style>
+</head>
+<body>
+
+  <div class="fan fan-1"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+  <div class="fan fan-2"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+  <div class="fan fan-3"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+  <div class="fan fan-4"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+  <div class="fan fan-5"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+  <div class="fan fan-6"><img src="/images/onlyfans_1.png" alt="Fan"></div>
+
+  <div class="wind-particle wp-1"></div>
+  <div class="wind-particle wp-2"></div>
+  <div class="wind-particle wp-3"></div>
+  <div class="wind-particle wp-4"></div>
+  <div class="wind-particle wp-5"></div>
+  <div class="wind-particle wp-6"></div>
+
+  <div class="debris blow-1">&#127810;</div>
+  <div class="debris blow-2">&#128196;</div>
+  <div class="debris blow-3">&#127811;</div>
+  <div class="debris blow-4">&#128220;</div>
+  <div class="debris blow-5">&#127810;</div>
+  <div class="debris blow-6">&#128196;</div>
+  <div class="debris blow-7">&#127811;</div>
+  <div class="debris blow-8">&#128221;</div>
+
+  <div class="punchline">
+    <h1 id="punchText"></h1>
+    <p>...what did you expect?</p>
+  </div>
+
+  <a href="/" class="back-link">&larr; back home</a>
+
+<script>
+const text = 'only fans.';
+const el = document.getElementById('punchText');
+text.split('').forEach((ch, i) => {
+  if (ch === ' ') {
+    const s = document.createElement('span');
+    s.innerHTML = '&nbsp;';
+    el.appendChild(s);
+    return;
+  }
+  const s = document.createElement('span');
+  s.textContent = ch;
+  s.style.setProperty('--d', `${i * 0.12}s`);
+  el.appendChild(s);
+});
+</script>
+
+</body>
+</html>
