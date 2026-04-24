@@ -2,132 +2,387 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PUPPET GARBAGE — Arlena Marie</title>
- <link rel="icon" href="/favicon.ico" sizes="48x48">
- <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
- <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
- <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Puppet Garbage — Arlena Marie</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; background:#f5f1e8; }
-  body {
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    font-family:'Caveat',cursive; color:#1a1209;
-    text-align:center; padding:2rem;
-  }
-  .page-name {
-    font-family:'Caveat Brush',cursive;
-    font-size:clamp(40px,10vw,72px);
-    line-height:1.1; margin-bottom:0.5rem;
-  }
-  .page-name span {
-    display:inline-block;
-    animation:wiggle 2.4s ease-in-out infinite;
-    animation-delay:var(--d,0s);
-  }
-  @keyframes wiggle {
-    0%,100%{transform:rotate(-5deg) translateY(0)}
-    50%{transform:rotate(5deg) translateY(-3px)}
-  }
-  .tagline {
-    font-size:clamp(18px,4vw,28px);
-    opacity:0.75; margin-bottom:2rem;
-  }
-  .back {
-    font-size:clamp(16px,3vw,20px);
-    color:#1a1209; text-decoration:none;
-    opacity:0.6; transition:opacity 0.2s;
-  }
-  .back:hover { opacity:1; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* Star orbit (simplified) */
-  .orbit-wrap {
-    position:fixed; top:50%; left:50%;
-    pointer-events:none; z-index:0;
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #fef0e5;
   }
-  .orbit-spin { animation:spin 55s linear infinite; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .s-star {
-    position:absolute;
-    animation:unspin 55s linear infinite;
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+    position: relative;
   }
-  @keyframes unspin { to{transform:rotate(-360deg)} }
-  .content { position:relative; z-index:1; }
+
+  /* ── Center content ── */
+  .center-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Glowing Name ── */
+  .glow-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.03em;
+    font-family: 'Caveat Brush', cursive;
+    font-size: clamp(36px, 10vmin, 80px);
+    color: #1a1209;
+    line-height: 1;
+  }
+
+  .glow-letter {
+    display: inline-block;
+    animation:
+      wiggle var(--spd, 3s) ease-in-out infinite,
+      glow var(--spd, 3s) ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    50%      { transform: rotate(4deg) translateY(-3px); }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      text-shadow:
+        0 0 6px #7bc67e,
+        0 0 12px #7bc67e,
+        0 0 18px #7bc67e;
+    }
+    50% {
+      text-shadow:
+        0 0 12px #7bc67e,
+        0 0 24px #7bc67e,
+        0 0 40px #7bc67e,
+        0 0 60px #7bc67e55;
+    }
+  }
+
+  /* ── Etsy button — centered between title and tagline ── */
+  .etsy-center {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.25s ease;
+    pointer-events: auto;
+    animation: gentleBounce 3s ease-in-out infinite;
+  }
+
+  .etsy-center:hover {
+    transform: scale(1.15);
+    animation-play-state: paused;
+  }
+
+  .etsy-center img {
+    width: clamp(55px, 9vmin, 90px);
+    height: clamp(55px, 9vmin, 90px);
+    object-fit: contain;
+    filter: drop-shadow(0 3px 10px rgba(0,0,0,0.12));
+  }
+
+  .etsy-center .shop-label {
+    margin-top: 2px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(13px, 2.2vmin, 18px);
+    color: #1a1209;
+    opacity: 0.75;
+  }
+
+  @keyframes gentleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .tagline {
+    font-size: clamp(20px, 4vmin, 32px);
+    color: #1a1209;
+    opacity: 0.65;
+    margin-top: 4px;
+  }
+
+  /* ── Merch Orbit (circle) ── */
+  .orbit-anchor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .orbit-ring {
+    animation: spin 50s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .merch-item {
+    position: absolute;
+    animation: unspin 50s linear infinite;
+  }
+
+  @keyframes unspin { to { transform: rotate(-360deg); } }
+
+  /* PNG orbit items need sizing */
+  .merch-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* ── Back link ── */
+  .back-link {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: clamp(16px, 3vmin, 20px);
+    color: #1a1209;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 30;
+  }
+
+  .back-link:hover { opacity: 1; }
+
+  /* ── Page transition ── */
   .page-transition {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #f5f1e8;
+    background: #fef0e5;
     z-index: 9999;
     pointer-events: none;
     animation: fadeOut 0.6s ease forwards;
   }
+
   .page-transition.leaving {
     animation: fadeIn 0.4s ease forwards;
   }
+
   @keyframes fadeOut {
     0% { opacity: 1; }
     100% { opacity: 0; }
   }
+
   @keyframes fadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
+  }
+
+  @media (max-width: 480px) {
+    .etsy-center img {
+      width: 50px;
+      height: 50px;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="orbit-wrap"><div class="orbit-spin" id="orbit"></div></div>
+  <!-- ═══ MERCH ORBIT ═══ -->
+  <div class="orbit-anchor">
+    <div class="orbit-ring" id="merchRing"></div>
+  </div>
 
-<div class="content">
-  <div class="page-name" id="pageName"></div>
-  <p class="tagline">something's brewing here</p>
-  <a href="/" class="back">← back home</a>
-</div>
+  <!-- ═══ CENTER: GLOWING NAME + ETSY + TAGLINE ═══ -->
+  <div class="center-content">
+    <div class="glow-row" id="glowName"></div>
+
+    <a href="https://www.etsy.com/shop/PuppetGarbage" target="_blank" rel="noopener" class="etsy-center">
+      <img src="/images/etsy_1.png" alt="Shop on Etsy">
+      <span class="shop-label">shop etsy</span>
+    </a>
+
+    <p class="tagline">come shop with me</p>
+  </div>
+
+  <!-- ═══ BACK LINK ═══ -->
+  <a href="/" class="back-link">&larr; back home</a>
+
+  <!-- ═══ PAGE TRANSITION ═══ -->
+  <div class="page-transition" id="pageFade"></div>
 
 <script>
-// Wiggling page name
-const name = "PUPPET GARBAGE";
-const el = document.getElementById('pageName');
-name.split('').forEach((ch,i) => {
-  if(ch===' '){const s=document.createElement('span');s.innerHTML='&nbsp;';s.style.width='0.3em';el.appendChild(s);return;}
-  const s = document.createElement('span');
-  s.textContent = ch;
-  s.style.setProperty('--d', i*0.13+'s');
-  el.appendChild(s);
+/* ── Glowing Wiggling Letters ── */
+const words = ['PUPPET', 'GARBAGE'];
+const el = document.getElementById('glowName');
+let globalIdx = 0;
+
+words.forEach((word, wi) => {
+  if (wi > 0) {
+    const space = document.createElement('span');
+    space.innerHTML = '&nbsp;&nbsp;';
+    el.appendChild(space);
+  }
+  word.split('').forEach((ch, i) => {
+    const s = document.createElement('span');
+    s.className = 'glow-letter';
+    s.textContent = ch;
+    s.style.setProperty('--d', `${globalIdx * 0.12}s`);
+    s.style.setProperty('--spd', '3s');
+    el.appendChild(s);
+    globalIdx++;
+  });
 });
 
-// Mini star orbit
-const colors = ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'];
-const ring = document.getElementById('orbit');
-for(let i=0;i<8;i++){
-  const a = Math.PI*2/8*i;
-  const rx = Math.min(window.innerWidth,window.innerHeight)*0.35;
-  const ry = rx*0.85;
-  const sz = 14 + ((i*37)%100)/100*22;
-  const d = document.createElement('div');
-  d.className='s-star';
-  d.style.left = (rx*Math.cos(a)-sz/2)+'px';
-  d.style.top  = (ry*Math.sin(a)-sz/2)+'px';
-  const pts=[];
-  for(let j=0;j<10;j++){const r=j%2===0?45:18;const ang=Math.PI/5*j-Math.PI/2;pts.push((50+r*Math.cos(ang))+','+(50+r*Math.sin(ang)));}
-  d.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100"><polygon points="'+pts.join(' ')+'" fill="'+colors[i%6]+'" stroke="#1a1209" stroke-width="2.5" stroke-linejoin="round"/></svg>';
-  ring.appendChild(d);
+/* ── Orbiting Merch — perfect circle ── */
+const ring = document.getElementById('merchRing');
+
+/* Use the smaller viewport dimension for a perfect circle */
+const radius = Math.min(window.innerWidth, window.innerHeight) * 0.37;
+
+const strokeColor = '#1a1209';
+const sw = 2.5;
+
+const fillPeach = '#f5c4a1';
+const fillMint = '#b8e0d2';
+const fillCream = '#f5e6d0';
+const fillPink = '#f4b6c2';
+
+/* SVG merch generators */
+function svgTshirt(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30,20 L20,20 L5,35 L15,45 L25,35 L25,85 L75,85 L75,35 L85,45 L95,35 L80,20 L70,20 C70,30 60,38 50,38 C40,38 30,30 30,20 Z" 
+      fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}" stroke-linejoin="round"/>
+  </svg>`;
 }
+
+function svgCap(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="62" rx="38" ry="18" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+    <path d="M15,62 C15,62 15,35 50,30 C85,35 85,62 85,62" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}" stroke-linejoin="round"/>
+    <path d="M15,62 L2,65 C2,65 5,72 18,70" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}" stroke-linejoin="round"/>
+    <circle cx="50" cy="32" r="4" fill="${strokeColor}"/>
+  </svg>`;
+}
+
+function svgMug(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="25" width="50" height="55" rx="5" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+    <path d="M70,40 C85,40 88,55 85,65 C82,72 70,72 70,65" fill="none" stroke="${strokeColor}" stroke-width="${sw}" stroke-linejoin="round"/>
+    <path d="M30,15 C30,10 35,8 37,12" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M45,12 C45,7 50,5 52,9" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M58,15 C58,10 63,8 65,12" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function svgTote(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22" y="35" width="56" height="52" rx="3" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+    <path d="M35,35 C35,20 40,12 50,12 C60,12 65,20 65,35" fill="none" stroke="${strokeColor}" stroke-width="${sw}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function svgHoodie(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M28,25 L18,25 L5,42 L18,50 L25,42 L25,88 L75,88 L75,42 L82,50 L95,42 L82,25 L72,25" 
+      fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}" stroke-linejoin="round"/>
+    <path d="M28,25 C28,25 35,15 50,15 C65,15 72,25 72,25" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+    <path d="M42,25 L42,45 C42,50 50,55 50,55 C50,55 58,50 58,45 L58,25" fill="none" stroke="${strokeColor}" stroke-width="1.5"/>
+    <ellipse cx="50" cy="18" rx="8" ry="5" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+  </svg>`;
+}
+
+function svgPin(sz, fill) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="42" r="30" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"/>
+    <rect x="47" y="72" width="6" height="18" rx="2" fill="${strokeColor}"/>
+    <circle cx="42" cy="38" r="4" fill="${strokeColor}" opacity="0.5"/>
+    <circle cx="56" cy="38" r="4" fill="${strokeColor}" opacity="0.5"/>
+    <path d="M42,50 C44,55 56,55 58,50" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* 
+  8 items in orbit, positions 0-7 around the circle.
+  Position 0 and 4 are directly across from each other — 
+  these get the real Puppet Garbage PNG icons.
+  The other 6 get SVG merch items.
+*/
+
+const items = [
+  { type: 'png', src: '/images/Puppet_Garbage_1.png', sz: 55 },  // pos 0
+  { type: 'svg', gen: svgTshirt, fill: fillPeach, sz: 42 },       // pos 1
+  { type: 'svg', gen: svgCap, fill: fillMint, sz: 38 },           // pos 2
+  { type: 'svg', gen: svgMug, fill: fillCream, sz: 40 },          // pos 3
+  { type: 'png', src: '/images/Puppet_Garbage_2.png', sz: 55 },  // pos 4 (opposite)
+  { type: 'svg', gen: svgHoodie, fill: fillPink, sz: 42 },        // pos 5
+  { type: 'svg', gen: svgTote, fill: fillPeach, sz: 38 },         // pos 6
+  { type: 'svg', gen: svgPin, fill: fillMint, sz: 36 },           // pos 7
+];
+
+items.forEach((item, i) => {
+  const ang = (Math.PI * 2 / items.length) * i;
+  const x = radius * Math.cos(ang) - item.sz / 2;
+  const y = radius * Math.sin(ang) - item.sz / 2;
+
+  const d = document.createElement('div');
+  d.className = 'merch-item';
+  d.style.left = `${x}px`;
+  d.style.top  = `${y}px`;
+  d.style.width = `${item.sz}px`;
+  d.style.height = `${item.sz}px`;
+
+  if (item.type === 'png') {
+    const img = document.createElement('img');
+    img.src = item.src;
+    img.alt = 'Puppet Garbage';
+    d.appendChild(img);
+  } else {
+    d.innerHTML = item.gen(item.sz, item.fill);
+  }
+
+  ring.appendChild(d);
+});
+
+/* Recalculate on resize */
+window.addEventListener('resize', function() {
+  const r = Math.min(window.innerWidth, window.innerHeight) * 0.37;
+  const allItems = ring.querySelectorAll('.merch-item');
+  allItems.forEach((d, i) => {
+    const ang = (Math.PI * 2 / items.length) * i;
+    const sz = items[i].sz;
+    d.style.left = `${r * Math.cos(ang) - sz / 2}px`;
+    d.style.top  = `${r * Math.sin(ang) - sz / 2}px`;
+  });
+});
+
+/* ── Page transitions ── */
+document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    var href = this.getAttribute('href');
+    var fade = document.getElementById('pageFade');
+    fade.classList.add('leaving');
+    setTimeout(function() { window.location.href = href; }, 400);
+  });
+});
 </script>
-  <div class="page-transition" id="pageFade"></div>
-  <script>
-    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var href = this.getAttribute('href');
-        var fade = document.getElementById('pageFade');
-        fade.classList.add('leaving');
-        setTimeout(function() { window.location.href = href; }, 400);
-      });
-    });
-  </script>
+
 </body>
 </html>
