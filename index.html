@@ -164,6 +164,25 @@
   @media (max-height: 480px) {
     .world { width: 90vh; height: 90vh; }
   }
+  .page-transition {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #f5f1e8;
+    z-index: 9999;
+    pointer-events: none;
+    animation: fadeOut 0.6s ease forwards;
+  }
+  .page-transition.leaving {
+    animation: fadeIn 0.4s ease forwards;
+  }
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -321,5 +340,17 @@ function layoutStars() {
 window.addEventListener('resize', layoutStars);
 </script>
 
+  <div class="page-transition" id="pageFade"></div>
+  <script>
+    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var href = this.getAttribute('href');
+        var fade = document.getElementById('pageFade');
+        fade.classList.add('leaving');
+        setTimeout(function() { window.location.href = href; }, 400);
+      });
+    });
+  </script>
 </body>
 </html>
