@@ -14,7 +14,8 @@
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script>
-  /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro) */
+  /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro).
+     Skipped for reduced motion: the page starts in its final layout instead. */
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro');
 </script>
 <style>
@@ -170,20 +171,21 @@ const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
 /* ── Intro and idle motion ──
    Choreography board timings: stars 0 s, letters 0.6 s, tiles 1.5 s, all back.out(1.7).
    Each star starts orbiting and each letter starts wiggling as it lands.
-   Reduced motion: no intro, no idle motion, everything at its static position. */
-Site.motion((gsap, { intro, reduced }) => {
-  // Hover is user-driven, so it stays on with reduced motion
+   Reduced motion drops only the transitions: no intro (html.intro is never
+   set, so intro is false here) and no view transition (site.css). The
+   ambient loops still run, starting from the final layout: orbit, wiggle
+   and hover. */
+Site.motion((gsap, { intro }) => {
   document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
-
-  if (reduced) return;
 
   const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');
   const tiles = gsap.utils.toArray('.world .tile-body');  // never .tile itself (see site.css)
   const ease = 'back.out(1.7)';
 
   // Idle wiggle: -5deg to 5deg and up 4 px and back, 2.4 s per cycle
-  const wiggle = el => gsap.fromTo(el, { rotation: -5, y: 0 },
-    { rotation: 5, y: -4, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
+  // Registered with Site.loop so a back/forward cache restore can resume it
+  const wiggle = el => Site.loop(gsap.fromTo(el, { rotation: -5, y: 0 },
+    { rotation: 5, y: -4, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true }));
 
   if (!intro) {
     orbit.items.forEach((_, i) => orbit.start(i));
@@ -191,7 +193,8 @@ Site.motion((gsap, { intro, reduced }) => {
     return;
   }
 
-  gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') })
+  // Registered with Site.intro so a back/forward cache restore finishes it instead of replaying
+  Site.intro(gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') }))
     .fromTo(orbit.items, { opacity: 0, scale: 0.4 }, {
       opacity: 1, scale: 1, duration: 0.7, ease,
       stagger: { each: 0.05, onComplete() { orbit.start(orbit.items.indexOf(this.targets()[0])); } },
