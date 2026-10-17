@@ -3,6 +3,26 @@
    are CSS custom properties. Pages set --page-bg in their own <style>;
    site.js sets the orbit and title variables from each page's config. */
 
+/* ── Fonts (self-hosted, Latin subset from Google Fonts, SIL OFL 1.1) ──
+   Licences: /assets/fonts/OFL-Caveat.txt and OFL-CaveatBrush.txt.
+   Every page preloads both files from its <head>; keep those paths in sync.
+   Caveat is a variable font, so one file covers weights 400 to 700. */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/assets/fonts/caveat-latin.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Caveat Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/fonts/caveat-brush-latin.woff2) format('woff2');
+}
+
 /* ── Palette ── */
 :root {
   --cream: #f5f1e8;
