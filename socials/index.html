@@ -8,21 +8,19 @@
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --page-bg: #f9e4e8; }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    background: #f9e4e8;
-  }
+  html, body { overflow: hidden; }
 
   body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Caveat', cursive;
     position: relative;
   }
 
@@ -42,67 +40,16 @@
     gap: 0.03em;
     font-family: 'Caveat Brush', cursive;
     font-size: clamp(48px, 12vmin, 96px);
-    color: #1a1209;
+    color: var(--ink);
     line-height: 1;
-  }
-
-  .glow-letter {
-    display: inline-block;
-    animation:
-      wiggle var(--spd, 3s) ease-in-out infinite,
-      glow var(--spd, 3s) ease-in-out infinite;
-    animation-delay: var(--d, 0s);
-  }
-
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(-4deg) translateY(0); }
-    50%      { transform: rotate(4deg) translateY(-3px); }
-  }
-
-  @keyframes glow {
-    0%, 100% {
-      text-shadow:
-        0 0 6px #ff6b9d,
-        0 0 12px #ff6b9d,
-        0 0 18px #ff6b9d;
-    }
-    50% {
-      text-shadow:
-        0 0 12px #ff6b9d,
-        0 0 24px #ff6b9d,
-        0 0 40px #ff6b9d,
-        0 0 60px #ff6b9d55;
-    }
   }
 
   .tagline {
     font-size: clamp(18px, 4vmin, 28px);
-    color: #1a1209;
+    color: var(--ink);
     opacity: 0.65;
     margin-top: 12px;
   }
-
-  /* ── Heart Orbit ── */
-  .heart-anchor {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .heart-ring {
-    animation: spin 55s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .heart-item {
-    position: absolute;
-    animation: unspin 55s linear infinite;
-  }
-
-  @keyframes unspin { to { transform: rotate(-360deg); } }
 
   /* ── Floating social icons ── */
   .floater {
@@ -130,7 +77,7 @@
     font-family: 'Caveat', cursive;
     font-weight: 700;
     font-size: clamp(11px, 2vmin, 16px);
-    color: #1a1209;
+    color: var(--ink);
     white-space: nowrap;
     opacity: 0.85;
   }
@@ -174,23 +121,6 @@
   @keyframes dX4 { 0% { left: 55%; } 100% { left: 3%;  } }
   @keyframes dY4 { 0% { top: 5%;   } 100% { top: 72%; } }
 
-  /* ── Back link ── */
-  .back-link {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Caveat', cursive;
-    font-size: clamp(16px, 3vmin, 20px);
-    color: #1a1209;
-    text-decoration: none;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-    z-index: 30;
-  }
-
-  .back-link:hover { opacity: 1; }
-
   /* ── Mobile ── */
   @media (max-width: 480px) {
     .floater-icon {
@@ -204,32 +134,13 @@
 }
 @keyframes dX5 { 0% { left: 45%; } 100% { left: 6%; } }
 @keyframes dY5 { 0% { top: 10%; } 100% { top: 70%; } }
-  .page-transition {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #f9e4e8;
-    z-index: 9999;
-    pointer-events: none;
-    animation: fadeOut 0.6s ease forwards;
-  }
-  .page-transition.leaving {
-    animation: fadeIn 0.4s ease forwards;
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
 </style>
 </head>
 <body>
 
   <!-- ═══ HEART ORBIT ═══ -->
-  <div class="heart-anchor">
-    <div class="heart-ring" id="heartRing"></div>
+  <div class="orbit-anchor">
+    <div class="orbit-ring" id="orbitRing"></div>
   </div>
 
   <!-- ═══ CENTER: GLOWING NAME + TAGLINE ═══ -->
@@ -273,29 +184,25 @@
     <span class="floater-handle">only fans</span>
   </a>
 </div>
- 
+
   <!-- ═══ BACK LINK ═══ -->
   <a href="/" class="back-link">&larr; back home</a>
 
+  <div class="page-transition" id="pageFade"></div>
+
+<script src="/assets/site.js"></script>
 <script>
-/* ── Glowing Wiggling Letters ── */
-const name = 'FOLLOW';
-const el = document.getElementById('glowName');
-name.split('').forEach((ch, i) => {
-  const s = document.createElement('span');
-  s.className = 'glow-letter';
-  s.textContent = ch;
-  s.style.setProperty('--d', `${i * 0.15}s`);
-  s.style.setProperty('--spd', '3s');
-  el.appendChild(s);
+/* ── Page config: socials ── */
+Site.title(document.getElementById('glowName'), 'FOLLOW', {
+  step: 0.15, rot: '4deg', lift: '3px', spd: '3s',
+  glow: '#ff6b9d', glowFaint: '#ff6b9d55',
 });
 
-/* ── Heart Orbit ── */
+/* 10 hearts, ellipse 35% of the shorter viewport side by 80% of that, sized 14 to 40 px.
+   Positions are set once at load (no resize relayout), as before. */
 const heartColors = ['#ff6b9d','#f4b6c2','#ffb3c6','#c9184a','#ffccd5','#ff8fab'];
-const ring = document.getElementById('heartRing');
-const heartCount = 10;
 
-function heartSVG(sz, fill, stroke, sw) {
+function heartSVG(sz, fill) {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('width', sz); svg.setAttribute('height', sz);
@@ -303,40 +210,26 @@ function heartSVG(sz, fill, stroke, sw) {
   const path = document.createElementNS(ns, 'path');
   path.setAttribute('d', 'M50,82 C50,82 15,60 15,35 C15,22 25,15 35,15 C42,15 47,18 50,25 C53,18 58,15 65,15 C75,15 85,22 85,35 C85,60 50,82 50,82 Z');
   path.setAttribute('fill', fill);
-  path.setAttribute('stroke', stroke);
-  path.setAttribute('stroke-width', sw);
+  path.setAttribute('stroke', Site.palette.ink);
+  path.setAttribute('stroke-width', 2.5);
   path.setAttribute('stroke-linejoin', 'round');
   svg.appendChild(path);
   return svg;
 }
 
-for (let i = 0; i < heartCount; i++) {
-  const ang = (Math.PI * 2 / heartCount) * i;
-  const rx = Math.min(window.innerWidth, window.innerHeight) * 0.35;
-  const ry = rx * 0.8;
-  const sz = 14 + ((i * 37) % 100) / 100 * 26;
-  const col = heartColors[i % heartColors.length];
-
-  const d = document.createElement('div');
-  d.className = 'heart-item';
-  d.style.left = `${rx * Math.cos(ang) - sz / 2}px`;
-  d.style.top  = `${ry * Math.sin(ang) - sz / 2}px`;
-  d.appendChild(heartSVG(sz, col, '#1a1209', 2.5));
-  ring.appendChild(d);
-}
+const r = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+Site.orbit(document.getElementById('orbitRing'), {
+  count: 10,
+  duration: '55s',
+  position: 'fixed',
+  z: 1,
+  item: i => {
+    const sz = 14 + ((i * 37) % 100) / 100 * 26;
+    return { sz, node: heartSVG(sz, heartColors[i % heartColors.length]) };
+  },
+  radius: () => ({ rx: r, ry: r * 0.8 }),
+  relayout: false,
+});
 </script>
-
-  <div class="page-transition" id="pageFade"></div>
-  <script>
-    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var href = this.getAttribute('href');
-        var fade = document.getElementById('pageFade');
-        fade.classList.add('leaving');
-        setTimeout(function() { window.location.href = href; }, 400);
-      });
-    });
-  </script>
 </body>
 </html>

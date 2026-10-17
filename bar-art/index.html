@@ -8,14 +8,15 @@
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 <style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; background:#f5f1e8; }
   body {
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    font-family:'Caveat',cursive; color:#1a1209;
+    color:var(--ink);
     text-align:center; padding:2rem;
   }
   .page-name {
@@ -23,63 +24,22 @@
     font-size:clamp(40px,10vw,72px);
     line-height:1.1; margin-bottom:0.5rem;
   }
-  .page-name span {
-    display:inline-block;
-    animation:wiggle 2.4s ease-in-out infinite;
-    animation-delay:var(--d,0s);
-  }
-  @keyframes wiggle {
-    0%,100%{transform:rotate(-5deg) translateY(0)}
-    50%{transform:rotate(5deg) translateY(-3px)}
-  }
   .tagline {
     font-size:clamp(18px,4vw,28px);
     opacity:0.75; margin-bottom:2rem;
   }
   .back {
     font-size:clamp(16px,3vw,20px);
-    color:#1a1209; text-decoration:none;
+    color:var(--ink); text-decoration:none;
     opacity:0.6; transition:opacity 0.2s;
   }
   .back:hover { opacity:1; }
-
-  /* Star orbit (simplified) */
-  .orbit-wrap {
-    position:fixed; top:50%; left:50%;
-    pointer-events:none; z-index:0;
-  }
-  .orbit-spin { animation:spin 55s linear infinite; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .s-star {
-    position:absolute;
-    animation:unspin 55s linear infinite;
-  }
-  @keyframes unspin { to{transform:rotate(-360deg)} }
   .content { position:relative; z-index:1; }
-  .page-transition {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #f5f1e8;
-    z-index: 9999;
-    pointer-events: none;
-    animation: fadeOut 0.6s ease forwards;
-  }
-  .page-transition.leaving {
-    animation: fadeIn 0.4s ease forwards;
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
 </style>
 </head>
 <body>
 
-<div class="orbit-wrap"><div class="orbit-spin" id="orbit"></div></div>
+<div class="orbit-anchor"><div class="orbit-ring" id="orbitRing"></div></div>
 
 <div class="content">
   <div class="page-name" id="pageName"></div>
@@ -87,47 +47,31 @@
   <a href="/" class="back">← back home</a>
 </div>
 
+  <div class="page-transition" id="pageFade"></div>
+
+<script src="/assets/site.js"></script>
 <script>
-// Wiggling page name
-const name = "BAR ART";
-const el = document.getElementById('pageName');
-name.split('').forEach((ch,i) => {
-  if(ch===' '){const s=document.createElement('span');s.innerHTML='&nbsp;';s.style.width='0.3em';el.appendChild(s);return;}
-  const s = document.createElement('span');
-  s.textContent = ch;
-  s.style.setProperty('--d', i*0.13+'s');
-  el.appendChild(s);
+/* ── Page config: stub page (about, bar-art, drinks-at-the-bar, the-never-ending-hero) ── */
+Site.title(document.getElementById('pageName'), 'BAR ART', {
+  step: 0.13, rot: '5deg', lift: '3px', spd: '2.4s',
+  space: { html: '&nbsp;', width: '0.3em', animate: true },
 });
 
-// Mini star orbit
-const colors = ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'];
-const ring = document.getElementById('orbit');
-for(let i=0;i<8;i++){
-  const a = Math.PI*2/8*i;
-  const rx = Math.min(window.innerWidth,window.innerHeight)*0.35;
-  const ry = rx*0.85;
-  const sz = 14 + ((i*37)%100)/100*22;
-  const d = document.createElement('div');
-  d.className='s-star';
-  d.style.left = (rx*Math.cos(a)-sz/2)+'px';
-  d.style.top  = (ry*Math.sin(a)-sz/2)+'px';
-  const pts=[];
-  for(let j=0;j<10;j++){const r=j%2===0?45:18;const ang=Math.PI/5*j-Math.PI/2;pts.push((50+r*Math.cos(ang))+','+(50+r*Math.sin(ang)));}
-  d.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100"><polygon points="'+pts.join(' ')+'" fill="'+colors[i%6]+'" stroke="#1a1209" stroke-width="2.5" stroke-linejoin="round"/></svg>';
-  ring.appendChild(d);
-}
+/* 8 stars, ellipse 35% of the shorter viewport side by 85% of that, sized 14 to 36 px.
+   Positions are set once at load (no resize relayout), as before. */
+const r = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+Site.orbit(document.getElementById('orbitRing'), {
+  count: 8,
+  duration: '55s',
+  position: 'fixed',
+  z: 0,
+  item: i => {
+    const sz = 14 + ((i * 37) % 100) / 100 * 22;
+    return { sz, node: Site.star(sz, Site.palette.stars[i % 6]) };
+  },
+  radius: () => ({ rx: r, ry: r * 0.85 }),
+  relayout: false,
+});
 </script>
-  <div class="page-transition" id="pageFade"></div>
-  <script>
-    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var href = this.getAttribute('href');
-        var fade = document.getElementById('pageFade');
-        fade.classList.add('leaving');
-        setTimeout(function() { window.location.href = href; }, 400);
-      });
-    });
-  </script>
 </body>
 </html>

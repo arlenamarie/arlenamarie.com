@@ -9,21 +9,16 @@
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    background: #f5f1e8;
-  }
+  html, body { overflow: hidden; }
 
   body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Caveat', cursive;
   }
 
   /* ── The whole composition lives in one square that scales with the viewport ── */
@@ -53,135 +48,18 @@
     gap: 0.02em;
     font-family: 'Caveat Brush', cursive;
     font-size: clamp(40px, 10vmin, 96px);
-    color: #1a1209;
+    color: var(--ink);
     line-height: 1.05;
   }
 
   .name-row + .name-row { margin-top: 0.02em; }
 
-  .letter {
-    display: inline-block;
-    animation: wiggle var(--spd, 2.4s) ease-in-out infinite;
-    animation-delay: var(--d, 0s);
-  }
-
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(-5deg) translateY(0); }
-    50%      { transform: rotate(5deg) translateY(-4px); }
-  }
-
-  /* ── Star Orbit ── */
-  .orbit-anchor {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .orbit-ring {
-    animation: spin 50s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .star-item {
-    position: absolute;
-    animation: unspin 50s linear infinite;
-  }
-
-  @keyframes unspin { to { transform: rotate(-360deg); } }
-
-  /* ── Nav Icons ── */
-  .tile {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    z-index: 5;
-    transition: transform 0.25s ease;
-  }
-
-  .tile:hover { transform: scale(1.1); }
-  /* Override for tiles that also use translate */
-  .tile.cx:hover { transform: translateX(-50%) scale(1.1); }
-
-  .tile-img {
-    position: relative;
-    width: clamp(60px, 14vmin, 140px);
-    height: clamp(60px, 14vmin, 140px);
-  }
-
-  .tile-img img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: opacity 0.3s ease;
-  }
-
-  .tile-img .idle  { opacity: 1; }
-  .tile-img .hover { opacity: 0; }
-  .tile:hover .idle  { opacity: 0; }
-  .tile:hover .hover { opacity: 1; }
-
-  .tile-label {
-    margin-top: 4px;
-    font-family: 'Caveat', cursive;
-    font-weight: 700;
-    font-size: clamp(11px, 2.2vmin, 20px);
-    color: #1a1209;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-
-  /* ── Hex positions (% of the .world square) ── */
-  /* Top center */
-  .tile.pos-t  { top: 1%;  left: 50%; transform: translateX(-50%); }
-  /* Left-upper */
-  .tile.pos-lu { top: 22%; left: 2%; }
-  /* Right-upper */
-  .tile.pos-ru { top: 22%; right: 2%; }
-  /* Left-lower */
-  .tile.pos-ll { top: 52%; left: 2%; }
-  /* Right-lower */
-  .tile.pos-rl { top: 52%; right: 2%; }
-  /* Bottom center */
-  .tile.pos-b  { bottom: 0%; left: 50%; transform: translateX(-50%); }
-
-  /* ── Small-screen tweaks ── */
   @media (max-width: 480px) {
-    .tile-img {
-      width: clamp(50px, 18vw, 90px);
-      height: clamp(50px, 18vw, 90px);
-    }
     .name-row { font-size: clamp(32px, 13vw, 56px); }
   }
 
   @media (max-height: 480px) {
     .world { width: 90vh; height: 90vh; }
-  }
-  .page-transition {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #f5f1e8;
-    z-index: 9999;
-    pointer-events: none;
-    animation: fadeOut 0.6s ease forwards;
-  }
-  .page-transition.leaving {
-    animation: fadeIn 0.4s ease forwards;
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
   }
 </style>
 </head>
@@ -256,101 +134,29 @@
 
 </div>
 
-<script>
-/* ── Wiggling Letters ── */
-function fillLetters(id, text) {
-  const el = document.getElementById(id);
-  const offset = id === 'nameRow2' ? 6 : 0;          // continue delay across rows
-  text.split('').forEach((ch, i) => {
-    if (ch === ' ') { const s = document.createElement('span'); s.style.width = '0.35em'; s.style.display = 'inline-block'; el.appendChild(s); return; }
-    const s = document.createElement('span');
-    s.className = 'letter';
-    s.textContent = ch;
-    s.style.setProperty('--d', `${(offset + i) * 0.15}s`);
-    s.style.setProperty('--spd', '2.4s');
-    el.appendChild(s);
-  });
-}
-fillLetters('nameRow1', 'ARLENA');
-fillLetters('nameRow2', 'MARIE');
-
-/* ── Elliptical Star Orbit ── */
-const CFG = {
-  n: 12,
-  rx: 48,   // % of .world width
-  ry: 46,   // % of .world height
-  minS: 16, maxS: 40,
-  colors: ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'],
-  stroke: '#1a1209',
-  sw: 2.5
-};
-
-function starSVG(sz, fill) {
-  const pts = [];
-  for (let i = 0; i < 10; i++) {
-    const r = i % 2 === 0 ? 45 : 18;
-    const a = Math.PI / 5 * i - Math.PI / 2;
-    pts.push(`${50 + r * Math.cos(a)},${50 + r * Math.sin(a)}`);
-  }
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', sz); svg.setAttribute('height', sz);
-  svg.setAttribute('viewBox', '0 0 100 100');
-  const pg = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  pg.setAttribute('points', pts.join(' '));
-  pg.setAttribute('fill', fill);
-  pg.setAttribute('stroke', CFG.stroke);
-  pg.setAttribute('stroke-width', CFG.sw);
-  pg.setAttribute('stroke-linejoin', 'round');
-  svg.appendChild(pg);
-  return svg;
-}
-
-const ring = document.getElementById('orbitRing');
-for (let i = 0; i < CFG.n; i++) {
-  const ang = (360 / CFG.n) * i;
-  const rad = ang * Math.PI / 180;
-  const sz = CFG.minS + ((i * 37) % 100) / 100 * (CFG.maxS - CFG.minS);
-  const col = CFG.colors[i % CFG.colors.length];
-
-  // Position as % of the world container (converted via vmin trick: the orbit-anchor is at 50%/50%)
-  const world = document.querySelector('.world');
-  const xPx = CFG.rx / 100 * world.offsetWidth * Math.cos(rad);
-  const yPx = CFG.ry / 100 * world.offsetHeight * Math.sin(rad);
-
-  const d = document.createElement('div');
-  d.className = 'star-item';
-  d.style.left = `${xPx - sz / 2}px`;
-  d.style.top  = `${yPx - sz / 2}px`;
-  d.appendChild(starSVG(sz, col));
-  ring.appendChild(d);
-}
-
-/* Re-position stars on resize */
-function layoutStars() {
-  const world = document.querySelector('.world');
-  const items = ring.querySelectorAll('.star-item');
-  items.forEach((d, i) => {
-    const ang = (360 / CFG.n) * i;
-    const rad = ang * Math.PI / 180;
-    const sz = CFG.minS + ((i * 37) % 100) / 100 * (CFG.maxS - CFG.minS);
-    d.style.left = `${CFG.rx / 100 * world.offsetWidth * Math.cos(rad) - sz / 2}px`;
-    d.style.top  = `${CFG.ry / 100 * world.offsetHeight * Math.sin(rad) - sz / 2}px`;
-  });
-}
-window.addEventListener('resize', layoutStars);
-</script>
-
   <div class="page-transition" id="pageFade"></div>
-  <script>
-    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var href = this.getAttribute('href');
-        var fade = document.getElementById('pageFade');
-        fade.classList.add('leaving');
-        setTimeout(function() { window.location.href = href; }, 400);
-      });
-    });
-  </script>
+
+<script src="/assets/site.js"></script>
+<script>
+/* ── Page config: homepage ── */
+const wiggle = { step: 0.15, rot: '5deg', lift: '4px', spd: '2.4s', space: { width: '0.35em' } };
+Site.title(document.getElementById('nameRow1'), 'ARLENA', wiggle);
+Site.title(document.getElementById('nameRow2'), 'MARIE', { ...wiggle, offset: 6 }); // continue delay across rows
+
+/* 12 stars on an ellipse at 48% x 46% of the .world square, sized 16 to 40 px */
+const world = document.querySelector('.world');
+Site.orbit(document.getElementById('orbitRing'), {
+  count: 12,
+  duration: '50s',
+  position: 'absolute',
+  z: 1,
+  item: i => {
+    const sz = 16 + ((i * 37) % 100) / 100 * (40 - 16);
+    return { sz, node: Site.star(sz, Site.palette.stars[i % 6]) };
+  },
+  radius: () => ({ rx: 0.48 * world.offsetWidth, ry: 0.46 * world.offsetHeight }),
+  relayout: true,
+});
+</script>
 </body>
 </html>
