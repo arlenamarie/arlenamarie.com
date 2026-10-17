@@ -202,6 +202,44 @@
     });
   }
 
+  /* ── Hover (needs gsap; call inside Site.motion) ──
+     One quickTo owns --s, which CSS feeds to the scale property. A second
+     owns --swap, which cross-fades the icons and drops the label (site.css).
+     quickTo always retargets from the current value, so rapid in/out can
+     never leave the element mid-state.
+     opts: scale (hover, default 1.12), press (default 1.04), swap (default true) */
+  function hover(el, opts) {
+    const o = Object.assign({ scale: 1.12, press: 1.04, swap: true }, opts);
+    const gsap = window.gsap;
+    gsap.set(el, { '--s': 1, '--swap': 0 });
+    const s = gsap.quickTo(el, '--s', { duration: 0.28, ease: 'power2.out' });
+    const sw = o.swap ? gsap.quickTo(el, '--swap', { duration: 0.22, ease: 'power1.out' }) : null;
+    let over = false;
+
+    const scaleTo = (v, d) => { s.tween.duration(d); s(v); };
+    const show = on => {
+      over = on;
+      scaleTo(on ? o.scale : 1, 0.28);
+      if (sw) sw(on ? 1 : 0);
+    };
+    // Jump straight to the true state (no tween)
+    const snap = () => {
+      over = el.matches(':hover');
+      s(over ? o.scale : 1, over ? o.scale : 1);
+      if (sw) sw(over ? 1 : 0, over ? 1 : 0);
+    };
+
+    el.addEventListener('pointerenter', () => show(true));
+    el.addEventListener('pointerleave', () => show(false));
+    el.addEventListener('pointercancel', () => show(false));
+    el.addEventListener('pointerdown', () => scaleTo(o.press, 0.1));
+    el.addEventListener('pointerup', () => scaleTo(over ? o.scale : 1, 0.28));
+    // Back/forward cache restores the page as it was left; resync to the pointer
+    window.addEventListener('pageshow', e => { if (e.persisted) snap(); });
+    // The CSS fallback may already be showing hover if gsap arrived mid-hover
+    if (el.matches(':hover')) show(true);
+  }
+
   /* ── Page fade: play the overlay in, then navigate ── */
   document.querySelectorAll('a:not([target="_blank"])').forEach(link => {
     link.addEventListener('click', e => {
@@ -212,5 +250,5 @@
     });
   });
 
-  window.Site = { palette, title, star, orbit, worldOrbit, motion, reduced };
+  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, reduced };
 })();

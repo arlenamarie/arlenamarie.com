@@ -171,6 +171,9 @@ const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
    Each star starts orbiting and each letter starts wiggling as it lands.
    Reduced motion: no intro, no idle motion, everything at its static position. */
 Site.motion((gsap, { intro, reduced }) => {
+  // Hover is user-driven, so it stays on with reduced motion
+  document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
+
   if (reduced) return;
 
   const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');

@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
   :root { --page-bg: #fef0e5; }
 
@@ -55,15 +56,17 @@
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    transition: transform 0.25s ease;
     pointer-events: auto;
     animation: gentleBounce 3s ease-in-out infinite;
+    /* Bounce owns transform; hover owns scale (--s, tweened by Site.hover) */
+    --s: 1;
+    scale: var(--s);
   }
 
-  .etsy-center:hover {
-    transform: scale(1.15);
-    animation-play-state: paused;
-  }
+  .etsy-center:hover { animation-play-state: paused; }
+
+  /* Until gsap loads (or if it never does): same end state, no tween */
+  html:not(.motion) .etsy-center:hover { --s: 1.15; }
 
   .etsy-center img {
     width: clamp(75px, 14vmin, 130px);
@@ -141,6 +144,9 @@ Site.title(document.getElementById('glowName'), 'PUPPET GARBAGE', {
   countSpaces: false, space: { html: '&nbsp;&nbsp;' },
   glow: '#7bc67e', glowFaint: '#7bc67e55',
 });
+
+/* Etsy button hover: same quickTo pattern as the homepage tiles, keeping its 1.15 size */
+Site.motion(() => Site.hover(document.querySelector('.etsy-center'), { scale: 1.15, swap: false }));
 
 /* ── Orbiting Merch — perfect circle ── */
 const strokeColor = Site.palette.ink;
