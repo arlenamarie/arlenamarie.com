@@ -240,15 +240,5 @@
     if (el.matches(':hover')) show(true);
   }
 
-  /* ── Page fade: play the overlay in, then navigate ── */
-  document.querySelectorAll('a:not([target="_blank"])').forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      const href = link.getAttribute('href');
-      document.getElementById('pageFade').classList.add('leaving');
-      setTimeout(() => { window.location.href = href; }, 400);
-    });
-  });
-
   window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, reduced };
 })();

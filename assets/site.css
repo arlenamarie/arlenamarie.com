@@ -202,17 +202,14 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
 
 .back-link:hover { opacity: 1; }
 
-/* ── Page fade overlay (fades out on load, in before navigating) ── */
-.page-transition {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--page-bg);
-  z-index: 9999;
-  pointer-events: none;
-  animation: fadeOut 0.6s ease forwards;
+/* ── Page transitions: native cross-document view transition ──
+   Same-origin links cross-fade in 0.35 s. Browsers without support just
+   navigate instantly. Off for reduced motion. */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.35s; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
 }
-
-.page-transition.leaving { animation: fadeIn 0.4s ease forwards; }
-
-@keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes fadeIn  { 0% { opacity: 0; } 100% { opacity: 1; } }
