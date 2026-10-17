@@ -154,10 +154,10 @@
       items,
       // Start item i moving (call when it lands)
       start(i) {
-        window.gsap.to(angles[i], {
+        loop(window.gsap.to(angles[i], {
           a: `+=${Math.PI * 2}`, duration: opts.duration, ease: 'none', repeat: -1,
           onUpdate: () => place(i),
-        });
+        }));
       },
     };
   }
@@ -202,6 +202,35 @@
     });
   }
 
+  /* ── Back/forward cache ──
+     A page restored from the back/forward cache keeps its JS state, but
+     mobile browsers can bring it back with GSAP's ticker asleep, which
+     freezes the orbit and the letter wiggle. On restore: finish the intro
+     without replaying it, drop html.intro, wake the ticker and resume every
+     idle loop. Pages register loops with Site.loop() and the intro with
+     Site.intro(); worldOrbit registers its own. */
+  const loops = [];
+  let introTl = null;
+
+  function loop(tween) { loops.push(tween); return tween; }
+  function intro(tl) { introTl = tl; return tl; }
+
+  window.addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    html.classList.remove('intro');
+    const gsap = window.gsap;
+    if (!gsap) return;
+    // Jumping to the end fires the intro's callbacks, which start any orbit
+    // or wiggle that had not landed yet
+    if (introTl && introTl.progress() < 1) introTl.progress(1);
+    gsap.ticker.wake();          // restarts the requestAnimationFrame loop
+    gsap.globalTimeline.resume();
+    loops.forEach(t => { if (t.paused()) t.resume(); });
+    // Watchdog: if GSAP's clock still has not moved, wake the ticker again
+    const t0 = gsap.ticker.time;
+    setTimeout(() => { if (gsap.ticker.time === t0) gsap.ticker.wake(); }, 500);
+  });
+
   /* ── Hover (needs gsap; call inside Site.motion) ──
      One quickTo owns --s, which CSS feeds to the scale property. A second
      owns --swap, which cross-fades the icons and drops the label (site.css).
@@ -240,5 +269,5 @@
     if (el.matches(':hover')) show(true);
   }
 
-  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, reduced };
+  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, loop, intro, reduced };
 })();

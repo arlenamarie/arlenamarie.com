@@ -182,8 +182,9 @@ Site.motion((gsap, { intro, reduced }) => {
   const ease = 'back.out(1.7)';
 
   // Idle wiggle: -5deg to 5deg and up 4 px and back, 2.4 s per cycle
-  const wiggle = el => gsap.fromTo(el, { rotation: -5, y: 0 },
-    { rotation: 5, y: -4, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
+  // Registered with Site.loop so a back/forward cache restore can resume it
+  const wiggle = el => Site.loop(gsap.fromTo(el, { rotation: -5, y: 0 },
+    { rotation: 5, y: -4, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true }));
 
   if (!intro) {
     orbit.items.forEach((_, i) => orbit.start(i));
@@ -191,7 +192,8 @@ Site.motion((gsap, { intro, reduced }) => {
     return;
   }
 
-  gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') })
+  // Registered with Site.intro so a back/forward cache restore finishes it instead of replaying
+  Site.intro(gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') }))
     .fromTo(orbit.items, { opacity: 0, scale: 0.4 }, {
       opacity: 1, scale: 1, duration: 0.7, ease,
       stagger: { each: 0.05, onComplete() { orbit.start(orbit.items.indexOf(this.targets()[0])); } },
