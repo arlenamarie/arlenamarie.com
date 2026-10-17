@@ -86,7 +86,40 @@ body { font-family: 'Caveat', cursive; }
 @keyframes orbit-spin { to { transform: rotate(360deg); } }
 @keyframes orbit-unspin { to { transform: rotate(-360deg); } }
 
-/* ── Nav tiles (homepage) ── */
+/* ── World orbit (homepage, GSAP) ──
+   Markup: .orbit-world > .orbit-slot > .orbit-star (added by Site.worldOrbit()).
+   Each slot covers .world, so translate(%) on it is a percent of .world. */
+.orbit-world {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.orbit-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-star svg { display: block; }
+
+/* Letters animated by GSAP get no keyframe wiggle */
+[data-motion="gsap"] .wiggle-letter { animation: none; }
+
+/* ── Intro: hidden until the GSAP timeline reveals them ──
+   html.intro is set in the page <head> (skipped for reduced motion) and
+   removed by site.js if GSAP does not arrive within 3 s. */
+.intro .orbit-star,
+.intro [data-motion="gsap"] .wiggle-letter,
+.intro .tile-body { opacity: 0; }
+
+/* ── Nav tiles (homepage) ──
+   .tile owns position (translate) and hover (scale). GSAP transforms only
+   the inner .tile-body, because GSAP folds an element's translate/scale
+   properties into its own transform and would freeze -50% as pixels. */
 .tile {
   position: absolute;
   display: flex;
@@ -94,12 +127,16 @@ body { font-family: 'Caveat', cursive; }
   align-items: center;
   text-decoration: none;
   z-index: 5;
-  transition: transform 0.25s ease;
+  transition: scale 0.25s ease;
 }
 
-.tile:hover { transform: scale(1.1); }
-/* Override for tiles that also use translate */
-.tile.cx:hover { transform: translateX(-50%) scale(1.1); }
+.tile:hover { scale: 1.1; }
+
+.tile-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .tile-img {
   position: relative;
@@ -133,12 +170,12 @@ body { font-family: 'Caveat', cursive; }
 }
 
 /* Hex positions (% of the .world square) */
-.tile.pos-t  { top: 1%;  left: 50%; transform: translateX(-50%); }  /* top center */
+.tile.pos-t  { top: 1%;  left: 50%; translate: -50% 0; }             /* top center */
 .tile.pos-lu { top: 22%; left: 2%; }                                  /* left upper */
 .tile.pos-ru { top: 22%; right: 2%; }                                 /* right upper */
 .tile.pos-ll { top: 52%; left: 2%; }                                  /* left lower */
 .tile.pos-rl { top: 52%; right: 2%; }                                 /* right lower */
-.tile.pos-b  { bottom: 0%; left: 50%; transform: translateX(-50%); } /* bottom center */
+.tile.pos-b  { bottom: 0%; left: 50%; translate: -50% 0; }          /* bottom center */
 
 @media (max-width: 480px) {
   .tile-img {

@@ -20,12 +20,14 @@
        countSpaces whether a space advances the delay index
        space       { html, width, animate } for how a space is drawn
        rot, lift, spd   wiggle size and speed
-       glow, glowFaint  pulse colors; omit for no glow */
+       glow, glowFaint  pulse colors; omit for no glow
+       driver      'css' (default, keyframe wiggle) or 'gsap' (page animates letters) */
   function title(el, text, opts) {
     const o = Object.assign({ step: 0.15, offset: 0, countSpaces: true, space: {} }, opts);
     if (o.rot)  el.style.setProperty('--wiggle-rot', o.rot);
     if (o.lift) el.style.setProperty('--wiggle-lift', o.lift);
     if (o.spd)  el.style.setProperty('--wiggle-spd', o.spd);
+    if (o.driver === 'gsap') el.dataset.motion = 'gsap';
     if (o.glow) {
       el.classList.add('glow');
       el.style.setProperty('--glow', o.glow);
@@ -118,6 +120,88 @@
     }
   }
 
+  /* ── World orbit (homepage) ──
+     Each item sits in a slot the size of .world and is moved with
+     translate(x%, y%), so the ellipse is in percent of .world and a resize
+     needs no JS. GSAP only advances each item's angle.
+     container: an empty element covering .world
+     opts:
+       count, rx, ry   items and ellipse radii in % of .world
+       duration        seconds per turn
+       item(i)         returns the node to place (the star) */
+  function worldOrbit(container, opts) {
+    const angles = [];
+    const slots = [];
+    const items = [];
+    const place = i => {
+      const a = angles[i].a;
+      slots[i].style.transform = `translate(${opts.rx * Math.cos(a)}%, ${opts.ry * Math.sin(a)}%)`;
+    };
+    for (let i = 0; i < opts.count; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'orbit-slot';
+      const it = document.createElement('div');
+      it.className = 'orbit-star';
+      it.appendChild(opts.item(i));
+      slot.appendChild(it);
+      container.appendChild(slot);
+      angles.push({ a: Math.PI * 2 / opts.count * i });
+      slots.push(slot);
+      items.push(it);
+      place(i);
+    }
+    return {
+      items,
+      // Start item i moving (call when it lands)
+      start(i) {
+        window.gsap.to(angles[i], {
+          a: `+=${Math.PI * 2}`, duration: opts.duration, ease: 'none', repeat: -1,
+          onUpdate: () => place(i),
+        });
+      },
+    };
+  }
+
+  /* ── GSAP loader ──
+     gsap core only, pinned with SRI. Pages that preload it list the same
+     URL and hash in their <head>; change all three together. */
+  const GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js';
+  const GSAP_SRI = 'sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==';
+  const html = document.documentElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let gsapLoad;
+
+  function loadGsap() {
+    if (!gsapLoad) {
+      gsapLoad = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = GSAP_SRC;
+        s.integrity = GSAP_SRI;
+        s.crossOrigin = 'anonymous';
+        s.referrerPolicy = 'no-referrer';
+        s.onload = () => { html.classList.add('motion'); resolve(window.gsap); };
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+    return gsapLoad;
+  }
+
+  /* Run fn(gsap, { intro, reduced }) once gsap is loaded.
+     intro is true when the page asked for one (html.intro, set in <head>)
+     and gsap arrived within 3 s. Otherwise the intro class is dropped so
+     the page shows statically, and fn should skip straight to idle motion. */
+  function motion(fn) {
+    const giveUp = setTimeout(() => html.classList.remove('intro'), 3000);
+    loadGsap().then(gsap => {
+      clearTimeout(giveUp);
+      fn(gsap, { intro: html.classList.contains('intro'), reduced });
+    }, () => {
+      clearTimeout(giveUp);
+      html.classList.remove('intro');
+    });
+  }
+
   /* ── Page fade: play the overlay in, then navigate ── */
   document.querySelectorAll('a:not([target="_blank"])').forEach(link => {
     link.addEventListener('click', e => {
@@ -128,5 +212,5 @@
     });
   });
 
-  window.Site = { palette, title, star, orbit };
+  window.Site = { palette, title, star, orbit, worldOrbit, motion, reduced };
 })();
