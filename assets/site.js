@@ -188,9 +188,11 @@
   }
 
   /* Run fn(gsap, { intro, reduced }) once gsap is loaded.
-     intro is true when the page asked for one (html.intro, set in <head>)
-     and gsap arrived within 3 s. Otherwise the intro class is dropped so
-     the page shows statically, and fn should skip straight to idle motion. */
+     intro is true when the page asked for one (html.intro, set in <head>,
+     never under reduced motion) and gsap arrived within 3 s. Otherwise the
+     intro class is dropped so the page shows its final layout, and fn should
+     skip straight to idle motion. Reduced motion only removes transitions
+     (intro, view transition); ambient loops still run. */
   function motion(fn) {
     const giveUp = setTimeout(() => html.classList.remove('intro'), 3000);
     loadGsap().then(gsap => {

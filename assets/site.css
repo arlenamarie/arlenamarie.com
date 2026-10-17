@@ -234,7 +234,8 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
 
 /* ── Page transitions: native cross-document view transition ──
    Same-origin links cross-fade in 0.35 s. Browsers without support just
-   navigate instantly. Off for reduced motion. */
+   navigate instantly. Off for reduced motion, which drops transitions only;
+   orbits, wiggles and hover keep running on every page. */
 @view-transition { navigation: auto; }
 
 ::view-transition-old(root),
