@@ -123,7 +123,7 @@
     <div class="glow-row" id="glowName"></div>
 
     <a href="https://www.etsy.com/shop/PuppetGarbage" target="_blank" rel="noopener" class="etsy-center">
-      <img src="/images/etsy_1.png" alt="Shop on Etsy">
+      <picture><source srcset="/images/etsy_1.webp" type="image/webp"><img src="/images/etsy_1.png" alt="Shop on Etsy"></picture>
       <span class="shop-label">shop etsy</span>
     </a>
 
@@ -228,10 +228,16 @@ const items = [
 
 function merchItem(item) {
   if (item.type === 'png') {
+    // WebP with the PNG as fallback, same as the static <picture> tags
+    const pic = document.createElement('picture');
+    const source = document.createElement('source');
+    source.srcset = item.src.replace(/\.png$/, '.webp');
+    source.type = 'image/webp';
     const img = document.createElement('img');
     img.src = item.src;
     img.alt = 'Puppet Garbage';
-    return { sz: item.sz, box: true, node: img };
+    pic.append(source, img);
+    return { sz: item.sz, box: true, node: pic };
   }
   return { sz: item.sz, box: true, html: item.gen(item.sz, item.fill) };
 }
