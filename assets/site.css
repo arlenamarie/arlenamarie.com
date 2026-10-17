@@ -133,12 +133,14 @@ picture { display: contents; }
 /* Letters animated by GSAP get no keyframe wiggle */
 [data-motion="gsap"] .wiggle-letter { animation: none; }
 
-/* ── Intro: hidden until the GSAP timeline reveals them ──
+/* ── Intro: starting state until the GSAP timeline animates it ──
    html.intro is set in the page <head> (skipped for reduced motion) and
-   removed by site.js if GSAP does not arrive within 3 s. */
+   removed by site.js if GSAP does not arrive within 3 s.
+   Stars and letters start hidden. Tiles start visible at half size, so
+   they paint on first render (this is what keeps LCP fast). */
 .intro .orbit-star,
-.intro [data-motion="gsap"] .wiggle-letter,
-.intro .tile-body { opacity: 0; }
+.intro [data-motion="gsap"] .wiggle-letter { opacity: 0; }
+.intro .tile-body { scale: 0.5; }
 
 /* ── Nav tiles (homepage) ──
    .tile owns position (translate) and hover (scale via --s). GSAP transforms only

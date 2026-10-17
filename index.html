@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script>
-  /* Hide stars, letters and tiles until the intro reveals them (site.css .intro) */
+  /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro) */
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro');
 </script>
 <style>
@@ -196,8 +196,8 @@ Site.motion((gsap, { intro, reduced }) => {
       opacity: 1, y: 0, scale: 1, rotation: -5, duration: 0.5, ease,
       stagger: { each: 0.08, onComplete() { wiggle(this.targets()[0]); } },
     }, 0.6)
-    .fromTo(tiles, { opacity: 0, scale: 0.5 }, {
-      opacity: 1, scale: 1, duration: 0.55, ease, stagger: 0.12,
+    .fromTo(tiles, { scale: 0.5 }, {
+      scale: 1, duration: 0.55, ease, stagger: 0.12,
     }, 1.5);
 });
 </script>
