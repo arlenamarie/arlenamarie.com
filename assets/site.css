@@ -50,6 +50,10 @@ body { font-family: 'Caveat', cursive; }
    so the <img> lays out exactly as if it were unwrapped */
 picture { display: contents; }
 
+/* <main> marks the page content for assistive tech without adding a box,
+   so each page's own body layout (flex centering) applies as before */
+main { display: contents; }
+
 /* ── Wiggle title ──
    Letters are built by Site.title(). Each page sets --wiggle-rot, --wiggle-lift
    and --wiggle-spd on the title element. Add .glow to the title for the
