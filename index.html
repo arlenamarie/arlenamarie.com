@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arlena Marie</title>
+<meta name="description" content="Arlena Marie: bar art, puppet garbage, a podcast and a never-ending hero.">
  <link rel="icon" href="/favicon.ico" sizes="48x48">
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-brush-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script>
+  /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro) */
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro');
+</script>
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    background: #f5f1e8;
-  }
+  html, body { overflow: hidden; }
 
   body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Caveat', cursive;
   }
 
   /* ── The whole composition lives in one square that scales with the viewport ── */
@@ -53,146 +53,28 @@
     gap: 0.02em;
     font-family: 'Caveat Brush', cursive;
     font-size: clamp(40px, 10vmin, 96px);
-    color: #1a1209;
+    color: var(--ink);
     line-height: 1.05;
   }
 
   .name-row + .name-row { margin-top: 0.02em; }
 
-  .letter {
-    display: inline-block;
-    animation: wiggle var(--spd, 2.4s) ease-in-out infinite;
-    animation-delay: var(--d, 0s);
-  }
-
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(-5deg) translateY(0); }
-    50%      { transform: rotate(5deg) translateY(-4px); }
-  }
-
-  /* ── Star Orbit ── */
-  .orbit-anchor {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .orbit-ring {
-    animation: spin 50s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .star-item {
-    position: absolute;
-    animation: unspin 50s linear infinite;
-  }
-
-  @keyframes unspin { to { transform: rotate(-360deg); } }
-
-  /* ── Nav Icons ── */
-  .tile {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    z-index: 5;
-    transition: transform 0.25s ease;
-  }
-
-  .tile:hover { transform: scale(1.1); }
-  /* Override for tiles that also use translate */
-  .tile.cx:hover { transform: translateX(-50%) scale(1.1); }
-
-  .tile-img {
-    position: relative;
-    width: clamp(60px, 14vmin, 140px);
-    height: clamp(60px, 14vmin, 140px);
-  }
-
-  .tile-img img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: opacity 0.3s ease;
-  }
-
-  .tile-img .idle  { opacity: 1; }
-  .tile-img .hover { opacity: 0; }
-  .tile:hover .idle  { opacity: 0; }
-  .tile:hover .hover { opacity: 1; }
-
-  .tile-label {
-    margin-top: 4px;
-    font-family: 'Caveat', cursive;
-    font-weight: 700;
-    font-size: clamp(11px, 2.2vmin, 20px);
-    color: #1a1209;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-
-  /* ── Hex positions (% of the .world square) ── */
-  /* Top center */
-  .tile.pos-t  { top: 1%;  left: 50%; transform: translateX(-50%); }
-  /* Left-upper */
-  .tile.pos-lu { top: 22%; left: 2%; }
-  /* Right-upper */
-  .tile.pos-ru { top: 22%; right: 2%; }
-  /* Left-lower */
-  .tile.pos-ll { top: 52%; left: 2%; }
-  /* Right-lower */
-  .tile.pos-rl { top: 52%; right: 2%; }
-  /* Bottom center */
-  .tile.pos-b  { bottom: 0%; left: 50%; transform: translateX(-50%); }
-
-  /* ── Small-screen tweaks ── */
   @media (max-width: 480px) {
-    .tile-img {
-      width: clamp(50px, 18vw, 90px);
-      height: clamp(50px, 18vw, 90px);
-    }
     .name-row { font-size: clamp(32px, 13vw, 56px); }
   }
 
   @media (max-height: 480px) {
     .world { width: 90vh; height: 90vh; }
   }
-  .page-transition {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #f5f1e8;
-    z-index: 9999;
-    pointer-events: none;
-    animation: fadeOut 0.6s ease forwards;
-  }
-  .page-transition.leaving {
-    animation: fadeIn 0.4s ease forwards;
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
 </style>
 </head>
 <body>
+<main>
 
 <div class="world">
 
   <!-- ═══ STAR ORBIT ═══ -->
-  <div class="orbit-anchor">
-    <div class="orbit-ring" id="orbitRing"></div>
-  </div>
+  <div class="orbit-world" id="orbitWorld"></div>
 
   <!-- ═══ WIGGLING NAME ═══ -->
   <div class="name-wrap">
@@ -200,157 +82,128 @@
     <div class="name-row" id="nameRow2"></div>
   </div>
 
-  <!-- ═══ FOLLOW — top center ═══ -->
+  <!-- ═══ FOLLOW, top center ═══ -->
   <a href="/socials" class="tile pos-t cx">
-    <div class="tile-img">
-      <img src="images/Socials_Follow_1.png" class="idle" alt="Follow">
-      <img src="images/Socials_Follow_2.png" class="hover" alt="Follow">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/Socials_Follow_1.webp" type="image/webp"><img src="images/Socials_Follow_1.png" class="idle" alt="Follow"></picture>
+        <picture><source srcset="images/Socials_Follow_2.webp" type="image/webp"><img src="images/Socials_Follow_2.png" class="hover" alt="Follow"></picture>
+      </div>
+      <span class="tile-label">Follow</span>
     </div>
-    <span class="tile-label">Follow</span>
   </a>
 
-  <!-- ═══ BAR ART — left upper ═══ -->
+  <!-- ═══ BAR ART, left upper ═══ -->
   <a href="/bar-art" class="tile pos-lu">
-    <div class="tile-img">
-      <img src="images/Lucille_1.png" class="idle" alt="Bar Art">
-      <img src="images/Lucille_2.png" class="hover" alt="Bar Art">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/Lucille_1.webp" type="image/webp"><img src="images/Lucille_1.png" class="idle" alt="Bar Art"></picture>
+        <picture><source srcset="images/Lucille_2.webp" type="image/webp"><img src="images/Lucille_2.png" class="hover" alt="Bar Art"></picture>
+      </div>
+      <span class="tile-label">Bar Art</span>
     </div>
-    <span class="tile-label">Bar Art</span>
   </a>
 
-  <!-- ═══ PODCAST — right upper ═══ -->
+  <!-- ═══ PODCAST, right upper ═══ -->
   <a href="/drinks-at-the-bar" class="tile pos-ru">
-    <div class="tile-img">
-      <img src="images/Drinks_at_the_Bar_1.png" class="idle" alt="Podcast">
-      <img src="images/Drinks_at_the_Bar_2.png" class="hover" alt="Podcast">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/Drinks_at_the_Bar_1.webp" type="image/webp"><img src="images/Drinks_at_the_Bar_1.png" class="idle" alt="Podcast"></picture>
+        <picture><source srcset="images/Drinks_at_the_Bar_2.webp" type="image/webp"><img src="images/Drinks_at_the_Bar_2.png" class="hover" alt="Podcast"></picture>
+      </div>
+      <span class="tile-label">Podcast</span>
     </div>
-    <span class="tile-label">Podcast</span>
   </a>
 
-  <!-- ═══ ABOUT — left lower ═══ -->
+  <!-- ═══ ABOUT, left lower ═══ -->
   <a href="/about" class="tile pos-ll">
-    <div class="tile-img">
-      <img src="images/About_Contact_1.png" class="idle" alt="About">
-      <img src="images/About_Contact_2.png" class="hover" alt="About">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/About_Contact_1.webp" type="image/webp"><img src="images/About_Contact_1.png" class="idle" alt="About"></picture>
+        <picture><source srcset="images/About_Contact_2.webp" type="image/webp"><img src="images/About_Contact_2.png" class="hover" alt="About"></picture>
+      </div>
+      <span class="tile-label">About</span>
     </div>
-    <span class="tile-label">About</span>
   </a>
 
-  <!-- ═══ THE HERO — right lower ═══ -->
+  <!-- ═══ THE HERO, right lower ═══ -->
   <a href="/the-never-ending-hero" class="tile pos-rl">
-    <div class="tile-img">
-      <img src="images/Inti_1.png" class="idle" alt="The Hero">
-      <img src="images/Inti_2.png" class="hover" alt="The Hero">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/Inti_1.webp" type="image/webp"><img src="images/Inti_1.png" class="idle" alt="The Hero"></picture>
+        <picture><source srcset="images/Inti_2.webp" type="image/webp"><img src="images/Inti_2.png" class="hover" alt="The Hero"></picture>
+      </div>
+      <span class="tile-label">The Hero</span>
     </div>
-    <span class="tile-label">The Hero</span>
   </a>
 
-  <!-- ═══ PUPPET GARBAGE — bottom center ═══ -->
+  <!-- ═══ PUPPET GARBAGE, bottom center ═══ -->
   <a href="/puppet-garbage" class="tile pos-b cx">
-    <div class="tile-img">
-      <img src="images/Puppet_Garbage_1.png" class="idle" alt="Puppet Garbage">
-      <img src="images/Puppet_Garbage_2.png" class="hover" alt="Puppet Garbage">
+    <div class="tile-body">
+      <div class="tile-img">
+        <picture><source srcset="images/Puppet_Garbage_1.webp" type="image/webp"><img src="images/Puppet_Garbage_1.png" class="idle" alt="Puppet Garbage"></picture>
+        <picture><source srcset="images/Puppet_Garbage_2.webp" type="image/webp"><img src="images/Puppet_Garbage_2.png" class="hover" alt="Puppet Garbage"></picture>
+      </div>
+      <span class="tile-label">Puppet Garbage</span>
     </div>
-    <span class="tile-label">Puppet Garbage</span>
   </a>
 
 </div>
 
+</main>
+
+<script src="/assets/site.js"></script>
 <script>
-/* ── Wiggling Letters ── */
-function fillLetters(id, text) {
-  const el = document.getElementById(id);
-  const offset = id === 'nameRow2' ? 6 : 0;          // continue delay across rows
-  text.split('').forEach((ch, i) => {
-    if (ch === ' ') { const s = document.createElement('span'); s.style.width = '0.35em'; s.style.display = 'inline-block'; el.appendChild(s); return; }
-    const s = document.createElement('span');
-    s.className = 'letter';
-    s.textContent = ch;
-    s.style.setProperty('--d', `${(offset + i) * 0.15}s`);
-    s.style.setProperty('--spd', '2.4s');
-    el.appendChild(s);
-  });
-}
-fillLetters('nameRow1', 'ARLENA');
-fillLetters('nameRow2', 'MARIE');
+/* ── Page config: homepage ── */
+/* Letters are animated by GSAP below (intro, then idle wiggle) */
+const title = { driver: 'gsap', space: { width: '0.35em' } };
+Site.title(document.getElementById('nameRow1'), 'ARLENA', title);
+Site.title(document.getElementById('nameRow2'), 'MARIE', title);
 
-/* ── Elliptical Star Orbit ── */
-const CFG = {
-  n: 12,
-  rx: 48,   // % of .world width
-  ry: 46,   // % of .world height
-  minS: 16, maxS: 40,
-  colors: ['#f4b6c2','#b8e0d2','#d4c5e8','#f5d985','#f5a896','#a8d8ea'],
-  stroke: '#1a1209',
-  sw: 2.5
-};
+/* 12 stars on an ellipse at 48% x 46% of the .world square, sized 16 to 40 px,
+   one turn every 50 s. Static at these positions until their orbit starts. */
+const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
+  count: 12, rx: 48, ry: 46, duration: 50,
+  item: i => Site.star(16 + ((i * 37) % 100) / 100 * (40 - 16), Site.palette.stars[i % 6]),
+});
 
-function starSVG(sz, fill) {
-  const pts = [];
-  for (let i = 0; i < 10; i++) {
-    const r = i % 2 === 0 ? 45 : 18;
-    const a = Math.PI / 5 * i - Math.PI / 2;
-    pts.push(`${50 + r * Math.cos(a)},${50 + r * Math.sin(a)}`);
+/* ── Intro and idle motion ──
+   Choreography board timings: stars 0 s, letters 0.6 s, tiles 1.5 s, all back.out(1.7).
+   Each star starts orbiting and each letter starts wiggling as it lands.
+   Reduced motion: no intro, no idle motion, everything at its static position. */
+Site.motion((gsap, { intro, reduced }) => {
+  // Hover is user-driven, so it stays on with reduced motion
+  document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
+
+  if (reduced) return;
+
+  const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');
+  const tiles = gsap.utils.toArray('.world .tile-body');  // never .tile itself (see site.css)
+  const ease = 'back.out(1.7)';
+
+  // Idle wiggle: -5deg to 5deg and up 4 px and back, 2.4 s per cycle
+  const wiggle = el => gsap.fromTo(el, { rotation: -5, y: 0 },
+    { rotation: 5, y: -4, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+  if (!intro) {
+    orbit.items.forEach((_, i) => orbit.start(i));
+    letters.forEach(wiggle);
+    return;
   }
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', sz); svg.setAttribute('height', sz);
-  svg.setAttribute('viewBox', '0 0 100 100');
-  const pg = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  pg.setAttribute('points', pts.join(' '));
-  pg.setAttribute('fill', fill);
-  pg.setAttribute('stroke', CFG.stroke);
-  pg.setAttribute('stroke-width', CFG.sw);
-  pg.setAttribute('stroke-linejoin', 'round');
-  svg.appendChild(pg);
-  return svg;
-}
 
-const ring = document.getElementById('orbitRing');
-for (let i = 0; i < CFG.n; i++) {
-  const ang = (360 / CFG.n) * i;
-  const rad = ang * Math.PI / 180;
-  const sz = CFG.minS + ((i * 37) % 100) / 100 * (CFG.maxS - CFG.minS);
-  const col = CFG.colors[i % CFG.colors.length];
-
-  // Position as % of the world container (converted via vmin trick: the orbit-anchor is at 50%/50%)
-  const world = document.querySelector('.world');
-  const xPx = CFG.rx / 100 * world.offsetWidth * Math.cos(rad);
-  const yPx = CFG.ry / 100 * world.offsetHeight * Math.sin(rad);
-
-  const d = document.createElement('div');
-  d.className = 'star-item';
-  d.style.left = `${xPx - sz / 2}px`;
-  d.style.top  = `${yPx - sz / 2}px`;
-  d.appendChild(starSVG(sz, col));
-  ring.appendChild(d);
-}
-
-/* Re-position stars on resize */
-function layoutStars() {
-  const world = document.querySelector('.world');
-  const items = ring.querySelectorAll('.star-item');
-  items.forEach((d, i) => {
-    const ang = (360 / CFG.n) * i;
-    const rad = ang * Math.PI / 180;
-    const sz = CFG.minS + ((i * 37) % 100) / 100 * (CFG.maxS - CFG.minS);
-    d.style.left = `${CFG.rx / 100 * world.offsetWidth * Math.cos(rad) - sz / 2}px`;
-    d.style.top  = `${CFG.ry / 100 * world.offsetHeight * Math.sin(rad) - sz / 2}px`;
-  });
-}
-window.addEventListener('resize', layoutStars);
+  gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') })
+    .fromTo(orbit.items, { opacity: 0, scale: 0.4 }, {
+      opacity: 1, scale: 1, duration: 0.7, ease,
+      stagger: { each: 0.05, onComplete() { orbit.start(orbit.items.indexOf(this.targets()[0])); } },
+    }, 0)
+    .fromTo(letters, { opacity: 0, y: 18, scale: 0.7, rotation: -5 }, {
+      opacity: 1, y: 0, scale: 1, rotation: -5, duration: 0.5, ease,
+      stagger: { each: 0.08, onComplete() { wiggle(this.targets()[0]); } },
+    }, 0.6)
+    .fromTo(tiles, { scale: 0.5 }, {
+      scale: 1, duration: 0.55, ease, stagger: 0.12,
+    }, 1.5);
+});
 </script>
-
-  <div class="page-transition" id="pageFade"></div>
-  <script>
-    document.querySelectorAll('a:not([target="_blank"])').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var href = this.getAttribute('href');
-        var fade = document.getElementById('pageFade');
-        fade.classList.add('leaving');
-        setTimeout(function() { window.location.href = href; }, 400);
-      });
-    });
-  </script>
 </body>
 </html>
