@@ -174,9 +174,15 @@ const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
    Reduced motion drops only the transitions: no intro (html.intro is never
    set, so intro is false here) and no view transition (site.css). The
    ambient loops still run, starting from the final layout: orbit, wiggle
-   and hover. */
-Site.motion((gsap, { intro }) => {
+   and hover. The one exception is the Bar Art sprite, which reduced motion
+   replaces with the plain cross-fade. */
+Site.motion((gsap, { intro, reduced }) => {
   document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
+
+  // Bar Art: Lucille raises her arms on hover (25 frames of 197x280, 0 = idle, 24 = arms up)
+  if (!reduced) Site.sprite(document.querySelector('.pos-lu'), {
+    src: 'images/Lucille_hover_sprite.webp', frames: 25, width: 197, height: 280, duration: 0.9,
+  });
 
   const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');
   const tiles = gsap.utils.toArray('.world .tile-body');  // never .tile itself (see site.css)

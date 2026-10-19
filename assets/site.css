@@ -188,6 +188,25 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
 .tile-img .idle  { opacity: calc(1 - var(--swap)); }
 .tile-img .hover { opacity: var(--swap); }
 
+/* Sprite hover (Site.sprite): a one-row sheet over the idle icon, sized and
+   centered the way object-fit: contain sizes one frame (aspect-ratio is set
+   inline). --frame (0 to --frames - 1) picks the frame; background-image is
+   set from JS after the sheet has loaded. */
+.tile-img .sprite {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  translate: -50% 0;
+  background: no-repeat 0 0 / calc(var(--frames) * 100%) 100%;
+  background-position-x: calc(var(--frame, 0) / (var(--frames) - 1) * 100%);
+  visibility: hidden;
+  pointer-events: none;
+}
+.tile.sprite-on .sprite { visibility: visible; }
+.tile.sprite-on .tile-img .idle,
+.tile.has-sprite .tile-img .hover { opacity: 0; }
+
 .tile-label {
   margin-top: 4px;
   font-family: 'Caveat', cursive;
