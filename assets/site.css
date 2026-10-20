@@ -188,21 +188,31 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
 .tile-img .idle  { opacity: calc(1 - var(--swap)); }
 .tile-img .hover { opacity: var(--swap); }
 
-/* Sprite hover (Site.sprite): a one-row sheet over the idle icon, sized and
-   centered the way object-fit: contain sizes one frame (aspect-ratio is set
-   inline). --frame (0 to --frames - 1) picks the frame; background-image is
-   set from JS after the sheet has loaded. */
+/* Sprite hover (Site.sprite): a one-row sheet over the idle icon. The window
+   is sized and centered the way object-fit: contain places one frame
+   (aspect-ratio is set inline), with auto margins rather than a transform.
+   The sheet is an <img>, not a background, and moves with left, not a
+   transform, so frame 0 is painted exactly like the idle <img> at the same
+   fractional position (Chrome snaps backgrounds to whole pixels, which put
+   frame 0 one pixel off the idle icon). --frame (0 to --frames - 1) picks
+   the frame. */
 .tile-img .sprite {
   position: absolute;
-  top: 0;
-  left: 50%;
+  inset: 0;
   height: 100%;
-  translate: -50% 0;
-  background: no-repeat 0 0 / calc(var(--frames) * 100%) 100%;
-  background-position-x: calc(var(--frame, 0) / (var(--frames) - 1) * 100%);
+  margin-inline: auto;
+  overflow: hidden;
   visibility: hidden;
   pointer-events: none;
 }
+.tile-img .sprite img {
+  inset: 0 auto auto calc(var(--frame, 0) * -100%);
+  width: calc(var(--frames) * 100%);
+  max-width: none;
+  object-fit: fill;
+}
+/* With a sprite the idle icon ignores --swap: it is frame 0, shown until frame 1 */
+.tile.has-sprite .tile-img .idle { opacity: 1; }
 .tile.sprite-on .sprite { visibility: visible; }
 .tile.sprite-on .tile-img .idle,
 .tile.has-sprite .tile-img .hover { opacity: 0; }

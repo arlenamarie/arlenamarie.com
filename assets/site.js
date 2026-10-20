@@ -272,14 +272,18 @@
   }
 
   /* ── Sprite hover (needs gsap; call inside Site.motion, next to Site.hover) ──
-     Plays a one-row sprite sheet forward on hover and back on leave, in a
-     div.sprite over the tile's idle icon (site.css). The sheet is fetched only
-     after window load; until it has decoded, the tile keeps its cross-fade.
+     Plays a one-row sprite sheet forward on hover and back on leave, as an
+     <img> in a div.sprite window over the tile's idle icon (site.css). The
+     sheet is fetched only after window load (the <img> gets its src then);
+     until it has decoded, the tile keeps its cross-fade.
      Once ready, .has-sprite hides the hover icon, and .sprite-on shows the
-     sprite (and hides the idle icon) from hover until the sheet is back on
-     frame 0. One tween per tile, retargeted on every event (overwrite) from
-     the current frame at the same frames per second both ways, so rapid
-     in/out never sticks; frames are rounded, so it never lands between two.
+     sprite (and hides the idle icon) on frames 1 and up. Frame 0 is always
+     the idle <img> itself, so hover starts with no jump: two images drawn at
+     the same spot still resample their edges slightly differently. One tween
+     per tile, retargeted on every event (overwrite) from the current frame
+     at the same frames per second both ways, so rapid in/out never sticks;
+     frames are rounded, so it never lands between two. .sprite-on follows
+     the drawn frame, so it can never disagree with it.
      Scale and label stay with Site.hover.
      opts: src, frames, width, height (one frame, px), duration (all frames, s) */
   function sprite(el, opts) {
@@ -290,36 +294,38 @@
     div.setAttribute('aria-hidden', 'true');
     div.style.aspectRatio = `${opts.width} / ${opts.height}`;
     div.style.setProperty('--frames', opts.frames);
+    const sheet = document.createElement('img');
+    sheet.alt = '';
+    sheet.draggable = false;
+    div.appendChild(sheet);
     el.querySelector('.tile-img').appendChild(div);
 
     const state = { f: 0 };
     let ready = false;
-    const draw = () => div.style.setProperty('--frame', Math.round(state.f));
+    const draw = () => {
+      const f = Math.round(state.f);
+      div.style.setProperty('--frame', f);
+      el.classList.toggle('sprite-on', f > 0);
+    };
     draw();
     const play = on => {
       if (!ready) return;
       const to = on ? last : 0;
-      if (on) el.classList.add('sprite-on');
       gsap.to(state, {
         f: to, duration: Math.abs(to - state.f) / last * opts.duration, ease: 'none', overwrite: true,
-        onUpdate: draw,
-        onComplete: () => { draw(); if (!on) el.classList.remove('sprite-on'); },
+        onUpdate: draw, onComplete: draw,
       });
     };
     // Jump straight to the true state (no tween)
     const snap = () => {
       gsap.killTweensOf(state);
-      const on = el.matches(':hover');
-      state.f = on ? last : 0;
+      state.f = el.matches(':hover') ? last : 0;
       draw();
-      el.classList.toggle('sprite-on', on);
     };
 
     const load = () => {
-      const img = new Image();
-      img.src = opts.src;
-      img.decode().then(() => {
-        div.style.backgroundImage = `url("${opts.src}")`;
+      sheet.src = opts.src;
+      sheet.decode().then(() => {
         el.classList.add('has-sprite');
         ready = true;
         if (el.matches(':hover')) play(true);
