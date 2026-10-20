@@ -157,6 +157,7 @@ main { display: contents; }
   align-items: center;
   text-decoration: none;
   z-index: 5;
+  -webkit-tap-highlight-color: transparent;  /* no grey tap flash over the sprite's first frame */
   --s: 1;       /* hover scale, tweened by Site.hover() */
   --swap: 0;    /* 0 = idle icon, 1 = hover icon and label dropped 2 px */
   scale: var(--s);
