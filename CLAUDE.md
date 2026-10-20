@@ -31,3 +31,12 @@ These apply to everything you write for me, in every project.
   and binaries need ARM64 builds, not x64.
 - I also work from a separate machine, so anything you set up should be
   portable between the two.
+
+## Known quirks
+
+- View transition abort in headless Chrome: occasionally (about 1 in 15
+  to 30 navigations, any page, on main too) the incoming page logs
+  `InvalidStateError: Transition was aborted because of invalid state.
+  ViewTransition opt-in disabled` and its `pagereveal` has no
+  `viewTransition`. Headless-only; not reproduced on real devices. Do not
+  treat it as a regression; rerun the check.
