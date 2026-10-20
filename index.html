@@ -11,7 +11,7 @@
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-brush-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v=a504f49">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script>
   /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro).
@@ -153,7 +153,7 @@
 
 </main>
 
-<script src="/assets/site.js"></script>
+<script src="/assets/site.js?v=43f7080"></script>
 <script>
 /* ── Page config: homepage ── */
 /* Letters are animated by GSAP below (intro, then idle wiggle) */
@@ -179,8 +179,9 @@ const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
 Site.motion((gsap, { intro, reduced }) => {
   document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
 
-  // Animated hover from each tile's sprite sheet (frame 0 = idle icon, last frame = hover pose)
-  if (!reduced) document.querySelectorAll('.world .tile[data-sprite]').forEach(t => Site.spriteHover(t));
+  // Animated hover from each tile's sprite sheet (frame 0 = idle icon, last frame = hover pose).
+  // Guarded: a stale cached site.js without spriteHover must not stop the intro below.
+  if (Site.spriteHover && !reduced) document.querySelectorAll('.world .tile[data-sprite]').forEach(t => Site.spriteHover(t));
 
   const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');
   const tiles = gsap.utils.toArray('.world .tile-body');  // never .tile itself (see site.css)
