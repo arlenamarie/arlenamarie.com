@@ -84,7 +84,7 @@
   </div>
 
   <!-- ═══ FOLLOW, top center ═══ -->
-  <a href="/socials" class="tile pos-t cx">
+  <a href="/socials" class="tile pos-t cx" data-sprite="images/Socials_Follow_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/Socials_Follow_1.webp" type="image/webp"><img src="images/Socials_Follow_1.png" class="idle" alt="Follow"></picture>
@@ -95,7 +95,7 @@
   </a>
 
   <!-- ═══ BAR ART, left upper ═══ -->
-  <a href="/bar-art" class="tile pos-lu">
+  <a href="/bar-art" class="tile pos-lu" data-sprite="images/Lucille_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/Lucille_1.webp" type="image/webp"><img src="images/Lucille_1.png" class="idle" alt="Bar Art"></picture>
@@ -106,7 +106,7 @@
   </a>
 
   <!-- ═══ PODCAST, right upper ═══ -->
-  <a href="/drinks-at-the-bar" class="tile pos-ru">
+  <a href="/drinks-at-the-bar" class="tile pos-ru" data-sprite="images/Drinks_at_the_Bar_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/Drinks_at_the_Bar_1.webp" type="image/webp"><img src="images/Drinks_at_the_Bar_1.png" class="idle" alt="Podcast"></picture>
@@ -117,7 +117,7 @@
   </a>
 
   <!-- ═══ ABOUT, left lower ═══ -->
-  <a href="/about" class="tile pos-ll">
+  <a href="/about" class="tile pos-ll" data-sprite="images/About_Contact_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/About_Contact_1.webp" type="image/webp"><img src="images/About_Contact_1.png" class="idle" alt="About"></picture>
@@ -128,7 +128,7 @@
   </a>
 
   <!-- ═══ THE HERO, right lower ═══ -->
-  <a href="/the-never-ending-hero" class="tile pos-rl">
+  <a href="/the-never-ending-hero" class="tile pos-rl" data-sprite="images/Inti_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/Inti_1.webp" type="image/webp"><img src="images/Inti_1.png" class="idle" alt="The Hero"></picture>
@@ -139,7 +139,7 @@
   </a>
 
   <!-- ═══ PUPPET GARBAGE, bottom center ═══ -->
-  <a href="/puppet-garbage" class="tile pos-b cx">
+  <a href="/puppet-garbage" class="tile pos-b cx" data-sprite="images/Puppet_Garbage_hover_sprite.webp" data-frames="25">
     <div class="tile-body">
       <div class="tile-img">
         <picture><source srcset="images/Puppet_Garbage_1.webp" type="image/webp"><img src="images/Puppet_Garbage_1.png" class="idle" alt="Puppet Garbage"></picture>
@@ -174,15 +174,13 @@ const orbit = Site.worldOrbit(document.getElementById('orbitWorld'), {
    Reduced motion drops only the transitions: no intro (html.intro is never
    set, so intro is false here) and no view transition (site.css). The
    ambient loops still run, starting from the final layout: orbit, wiggle
-   and hover. The one exception is the Bar Art sprite, which reduced motion
-   replaces with the plain cross-fade. */
+   and hover. The one exception is the sprite hover on tiles with
+   data-sprite, which reduced motion replaces with the plain cross-fade. */
 Site.motion((gsap, { intro, reduced }) => {
   document.querySelectorAll('.world .tile').forEach(t => Site.hover(t));
 
-  // Bar Art: Lucille raises her arms on hover (25 frames of 197x280, 0 = idle, 24 = arms up)
-  if (!reduced) Site.sprite(document.querySelector('.pos-lu'), {
-    src: 'images/Lucille_hover_sprite.webp', frames: 25, width: 197, height: 280, duration: 0.9,
-  });
+  // Animated hover from each tile's sprite sheet (frame 0 = idle icon, last frame = hover pose)
+  if (!reduced) document.querySelectorAll('.world .tile[data-sprite]').forEach(t => Site.spriteHover(t));
 
   const letters = gsap.utils.toArray('.name-wrap .wiggle-letter');
   const tiles = gsap.utils.toArray('.world .tile-body');  // never .tile itself (see site.css)

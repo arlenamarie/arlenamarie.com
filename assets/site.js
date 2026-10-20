@@ -273,9 +273,15 @@
 
   /* ── Sprite hover (needs gsap; call inside Site.motion, next to Site.hover) ──
      Plays a one-row sprite sheet forward on hover and back on leave, as an
-     <img> in a div.sprite window over the tile's idle icon (site.css). The
-     sheet is fetched only after window load (the <img> gets its src then);
-     until it has decoded, the tile keeps its cross-fade.
+     <img> in a div.sprite window over the tile's idle icon (site.css).
+     The tile names its sheet: data-sprite (URL) and data-frames (count);
+     the frame count gives each frame's share of the sheet. The window takes
+     the idle icon's own aspect (its natural size), so it is exactly where
+     the idle icon is drawn even when the idle WebP's size was rounded (a
+     frame of 517x280 fit into 280 px is 280x151.6; the WebP is 280x152).
+     A tile needs nothing else. The sheet is fetched
+     only after window load (the <img> gets its src then); until it has
+     decoded, the tile keeps its cross-fade.
      Once ready, .has-sprite hides the hover icon, and .sprite-on shows the
      sprite (and hides the idle icon) on frames 1 and up. Frame 0 is always
      the idle <img> itself, so hover starts with no jump: two images drawn at
@@ -285,15 +291,17 @@
      frames are rounded, so it never lands between two. .sprite-on follows
      the drawn frame, so it can never disagree with it.
      Scale and label stay with Site.hover.
-     opts: src, frames, width, height (one frame, px), duration (all frames, s) */
-  function sprite(el, opts) {
+     opts: duration (first to last frame, s, default 0.9) */
+  function spriteHover(el, opts) {
+    const o = Object.assign({ duration: 0.9 }, opts);
     const gsap = window.gsap;
-    const last = opts.frames - 1;
+    const src = el.dataset.sprite;
+    const frames = +el.dataset.frames;
+    const last = frames - 1;
     const div = document.createElement('div');
     div.className = 'sprite';
     div.setAttribute('aria-hidden', 'true');
-    div.style.aspectRatio = `${opts.width} / ${opts.height}`;
-    div.style.setProperty('--frames', opts.frames);
+    div.style.setProperty('--frames', frames);
     const sheet = document.createElement('img');
     sheet.alt = '';
     sheet.draggable = false;
@@ -312,7 +320,7 @@
       if (!ready) return;
       const to = on ? last : 0;
       gsap.to(state, {
-        f: to, duration: Math.abs(to - state.f) / last * opts.duration, ease: 'none', overwrite: true,
+        f: to, duration: Math.abs(to - state.f) / last * o.duration, ease: 'none', overwrite: true,
         onUpdate: draw, onComplete: draw,
       });
     };
@@ -324,8 +332,11 @@
     };
 
     const load = () => {
-      sheet.src = opts.src;
-      sheet.decode().then(() => {
+      sheet.src = src;
+      const idle = el.querySelector('.idle');
+      Promise.all([sheet.decode(), idle.decode()]).then(() => {
+        div.style.setProperty('--fw', idle.naturalWidth);
+        div.style.setProperty('--fh', idle.naturalHeight);
         el.classList.add('has-sprite');
         ready = true;
         if (el.matches(':hover')) play(true);
@@ -341,5 +352,5 @@
     window.addEventListener('pageshow', e => { if (e.persisted && ready) snap(); });
   }
 
-  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, sprite, loop, intro, reduced };
+  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, spriteHover, loop, intro, reduced };
 })();
