@@ -271,5 +271,75 @@
     if (el.matches(':hover')) show(true);
   }
 
-  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, loop, intro, reduced };
+  /* ── Sprite hover (needs gsap; call inside Site.motion, next to Site.hover) ──
+     Plays a one-row sprite sheet forward on hover and back on leave, as an
+     <img> in a div.sprite window over the tile's idle icon (site.css). The
+     sheet is fetched only after window load (the <img> gets its src then);
+     until it has decoded, the tile keeps its cross-fade.
+     Once ready, .has-sprite hides the hover icon, and .sprite-on shows the
+     sprite (and hides the idle icon) on frames 1 and up. Frame 0 is always
+     the idle <img> itself, so hover starts with no jump: two images drawn at
+     the same spot still resample their edges slightly differently. One tween
+     per tile, retargeted on every event (overwrite) from the current frame
+     at the same frames per second both ways, so rapid in/out never sticks;
+     frames are rounded, so it never lands between two. .sprite-on follows
+     the drawn frame, so it can never disagree with it.
+     Scale and label stay with Site.hover.
+     opts: src, frames, width, height (one frame, px), duration (all frames, s) */
+  function sprite(el, opts) {
+    const gsap = window.gsap;
+    const last = opts.frames - 1;
+    const div = document.createElement('div');
+    div.className = 'sprite';
+    div.setAttribute('aria-hidden', 'true');
+    div.style.aspectRatio = `${opts.width} / ${opts.height}`;
+    div.style.setProperty('--frames', opts.frames);
+    const sheet = document.createElement('img');
+    sheet.alt = '';
+    sheet.draggable = false;
+    div.appendChild(sheet);
+    el.querySelector('.tile-img').appendChild(div);
+
+    const state = { f: 0 };
+    let ready = false;
+    const draw = () => {
+      const f = Math.round(state.f);
+      div.style.setProperty('--frame', f);
+      el.classList.toggle('sprite-on', f > 0);
+    };
+    draw();
+    const play = on => {
+      if (!ready) return;
+      const to = on ? last : 0;
+      gsap.to(state, {
+        f: to, duration: Math.abs(to - state.f) / last * opts.duration, ease: 'none', overwrite: true,
+        onUpdate: draw, onComplete: draw,
+      });
+    };
+    // Jump straight to the true state (no tween)
+    const snap = () => {
+      gsap.killTweensOf(state);
+      state.f = el.matches(':hover') ? last : 0;
+      draw();
+    };
+
+    const load = () => {
+      sheet.src = opts.src;
+      sheet.decode().then(() => {
+        el.classList.add('has-sprite');
+        ready = true;
+        if (el.matches(':hover')) play(true);
+      }, () => {});  // sheet failed: the cross-fade stays
+    };
+    if (document.readyState === 'complete') load();
+    else window.addEventListener('load', load, { once: true });
+
+    el.addEventListener('pointerenter', () => play(true));
+    el.addEventListener('pointerleave', () => play(false));
+    el.addEventListener('pointercancel', () => play(false));
+    // Back/forward cache restores the page as it was left; resync to the pointer
+    window.addEventListener('pageshow', e => { if (e.persisted && ready) snap(); });
+  }
+
+  window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, sprite, loop, intro, reduced };
 })();
