@@ -279,9 +279,12 @@
      the idle icon's own aspect (its natural size), so it is exactly where
      the idle icon is drawn even when the idle WebP's size was rounded (a
      frame of 517x280 fit into 280 px is 280x151.6; the WebP is 280x152).
-     A tile needs nothing else. The sheet is fetched
-     only after window load (the <img> gets its src then); until it has
-     decoded, the tile keeps its cross-fade.
+     A tile needs nothing else. The sheet is fetched only after window load
+     and after the intro has finished (html.intro removed; the <img> gets its
+     src then), so the sheets never share bandwidth with the intro and arrive
+     after the title has painted its last letter (the page's LCP). Until a
+     sheet has decoded, its tile keeps the cross-fade and a tap navigates at
+     once.
      Once ready, .has-sprite hides the hover icon, and .sprite-on shows the
      sprite (and hides the idle icon) on frames 1 and up. Frame 0 is always
      the idle <img> itself, so hover starts with no jump: two images drawn at
@@ -291,7 +294,18 @@
      frames are rounded, so it never lands between two. .sprite-on follows
      the drawn frame, so it can never disagree with it.
      Scale and label stay with Site.hover.
+     Touch: a tap plays the sprite to its last frame, then follows the link
+     (a scripted same-origin navigation, so the view transition still runs).
+     A second tap while it plays follows the link at once; a tap on another
+     tile cancels this one. Touch pointers fire enter and leave around every
+     tap, so they do not drive the sprite. A tap counts as touch when the
+     pointer is touch, or the device has no hover and the pointer is not a
+     mouse. Mouse clicks and keyboard (click with detail 0) follow the link
+     at once, as before.
      opts: duration (first to last frame, s, default 0.9) */
+  let tapping = null;  // the tile whose tap is playing toward navigation
+  const noHover = window.matchMedia('(hover: none)');
+
   function spriteHover(el, opts) {
     const o = Object.assign({ duration: 0.9 }, opts);
     const gsap = window.gsap;
@@ -324,11 +338,19 @@
         onUpdate: draw, onComplete: draw,
       });
     };
-    // Jump straight to the true state (no tween)
+    // Jump straight to the true state (no tween). Touch screens leave :hover
+    // stuck on the last tapped element, so only a hovering mouse counts.
+    let lastType = '';
     const snap = () => {
       gsap.killTweensOf(state);
-      state.f = el.matches(':hover') ? last : 0;
+      state.f = lastType !== 'touch' && !noHover.matches && el.matches(':hover') ? last : 0;
       draw();
+    };
+
+    const tap = {
+      el,
+      cancel() { tapping = null; play(false); },
+      go() { tapping = null; window.location.href = el.href; },
     };
 
     const load = () => {
@@ -342,14 +364,44 @@
         if (el.matches(':hover')) play(true);
       }, () => {});  // sheet failed: the cross-fade stays
     };
-    if (document.readyState === 'complete') load();
-    else window.addEventListener('load', load, { once: true });
+    // After window load, then after the intro (Site.motion drops html.intro
+    // when the intro ends, or at once when there is none)
+    const afterIntro = () => {
+      if (!html.classList.contains('intro')) return load();
+      const mo = new MutationObserver(() => {
+        if (!html.classList.contains('intro')) { mo.disconnect(); load(); }
+      });
+      mo.observe(html, { attributes: true, attributeFilter: ['class'] });
+    };
+    if (document.readyState === 'complete') afterIntro();
+    else window.addEventListener('load', afterIntro, { once: true });
 
-    el.addEventListener('pointerenter', () => play(true));
-    el.addEventListener('pointerleave', () => play(false));
-    el.addEventListener('pointercancel', () => play(false));
+    const touch = e => e.pointerType === 'touch';
+    el.addEventListener('pointerdown', e => { lastType = e.pointerType; });
+    el.addEventListener('pointerenter', e => { if (!touch(e)) play(true); });
+    el.addEventListener('pointerleave', e => { if (!touch(e)) play(false); });
+    el.addEventListener('pointercancel', e => { if (!touch(e)) play(false); });
+
+    el.addEventListener('click', e => {
+      if (!ready || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.detail === 0) return;                    // keyboard
+      const type = e.pointerType || lastType;        // Safari may leave pointerType off the click
+      if (type === 'mouse' || !(type === 'touch' || noHover.matches)) return;
+      e.preventDefault();
+      if (tapping === tap) { gsap.killTweensOf(state); tap.go(); return; }  // second tap: go now
+      if (tapping) tapping.cancel();
+      tapping = tap;
+      gsap.to(state, {
+        f: last, duration: (last - state.f) / last * o.duration, ease: 'none', overwrite: true,
+        onUpdate: draw, onComplete: () => { draw(); if (tapping === tap) tap.go(); },
+      });
+    });
     // Back/forward cache restores the page as it was left; resync to the pointer
-    window.addEventListener('pageshow', e => { if (e.persisted && ready) snap(); });
+    window.addEventListener('pageshow', e => {
+      if (!e.persisted || !ready) return;
+      if (tapping === tap) tapping = null;
+      snap();
+    });
   }
 
   window.Site = { palette, title, star, orbit, worldOrbit, motion, hover, spriteHover, loop, intro, reduced };
