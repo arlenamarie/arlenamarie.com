@@ -279,12 +279,11 @@
      the idle icon's own aspect (its natural size), so it is exactly where
      the idle icon is drawn even when the idle WebP's size was rounded (a
      frame of 517x280 fit into 280 px is 280x151.6; the WebP is 280x152).
-     A tile needs nothing else. The sheet is fetched only after window load
-     and after the intro has finished (html.intro removed; the <img> gets its
-     src then), so the sheets never share bandwidth with the intro and arrive
-     after the title has painted its last letter (the page's LCP). Until a
-     sheet has decoded, its tile keeps the cross-fade and a tap navigates at
-     once.
+     A tile needs nothing else. The sheet is fetched after window load and
+     no earlier than SHEETS_AT (1.2 s from navigation start, when the title
+     letters have mostly landed), at fetchpriority low (the <img> gets its
+     src then). Until a sheet has decoded, its tile keeps the cross-fade and
+     a tap navigates at once.
      Once ready, .has-sprite hides the hover icon, and .sprite-on shows the
      sprite (and hides the idle icon) on frames 1 and up. Frame 0 is always
      the idle <img> itself, so hover starts with no jump: two images drawn at
@@ -304,6 +303,7 @@
      at once, as before.
      opts: duration (first to last frame, s, default 0.9) */
   let tapping = null;  // the tile whose tap is playing toward navigation
+  const SHEETS_AT = 1200;  // ms from navigation start before sprite sheets load
   const noHover = window.matchMedia('(hover: none)');
 
   function spriteHover(el, opts) {
@@ -354,6 +354,7 @@
     };
 
     const load = () => {
+      sheet.fetchPriority = 'low';
       sheet.src = src;
       const idle = el.querySelector('.idle');
       Promise.all([sheet.decode(), idle.decode()]).then(() => {
@@ -364,17 +365,10 @@
         if (el.matches(':hover')) play(true);
       }, () => {});  // sheet failed: the cross-fade stays
     };
-    // After window load, then after the intro (Site.motion drops html.intro
-    // when the intro ends, or at once when there is none)
-    const afterIntro = () => {
-      if (!html.classList.contains('intro')) return load();
-      const mo = new MutationObserver(() => {
-        if (!html.classList.contains('intro')) { mo.disconnect(); load(); }
-      });
-      mo.observe(html, { attributes: true, attributeFilter: ['class'] });
-    };
-    if (document.readyState === 'complete') afterIntro();
-    else window.addEventListener('load', afterIntro, { once: true });
+    // After window load, and no earlier than SHEETS_AT
+    const later = () => setTimeout(load, Math.max(0, SHEETS_AT - performance.now()));
+    if (document.readyState === 'complete') later();
+    else window.addEventListener('load', later, { once: true });
 
     const touch = e => e.pointerType === 'touch';
     el.addEventListener('pointerdown', e => { lastType = e.pointerType; });

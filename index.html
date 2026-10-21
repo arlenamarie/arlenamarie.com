@@ -11,7 +11,7 @@
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-brush-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=b5f2d5a">
+<link rel="stylesheet" href="/assets/site.css?v=54d800c">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script>
   /* Intro starting state: stars and letters hidden, tiles at half size (site.css .intro).
@@ -67,6 +67,12 @@
   @media (max-height: 480px) {
     .world { width: 90vh; height: 90vh; }
   }
+
+  /* Bottom tile lifted so the gap from the name to the can lid equals the gap
+     from the Follow label to the name (ink to ink). A percentage alone cannot
+     do it at every size, because labels and image boxes have pixel minimums;
+     fitted at 1280x800 (12 px up) and 390x844 (8.7 px up). */
+  .tile.pos-b { bottom: calc(0.883% + 5.5px); }
 </style>
 </head>
 <body>
@@ -153,7 +159,7 @@
 
 </main>
 
-<script src="/assets/site.js?v=fcf9841"></script>
+<script src="/assets/site.js?v=1839412"></script>
 <script>
 /* ── Page config: homepage ── */
 /* Letters are animated by GSAP below (intro, then idle wiggle) */

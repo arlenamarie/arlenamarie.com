@@ -172,10 +172,17 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
   align-items: center;
 }
 
+/* Image box: --box-base by viewport, times the tile's --box-scale (default 1).
+   A larger box grows up and out to both sides through negative margins, so
+   the tile's layout box, and with it the label and the hover scale origin,
+   stay where they are. */
 .tile-img {
+  --box-base: clamp(60px, 14vmin, 140px);
+  --box-grow: calc(var(--box-base) * (var(--box-scale, 1) - 1));
   position: relative;
-  width: clamp(60px, 14vmin, 140px);
-  height: clamp(60px, 14vmin, 140px);
+  width: calc(var(--box-base) * var(--box-scale, 1));
+  height: calc(var(--box-base) * var(--box-scale, 1));
+  margin: calc(-1 * var(--box-grow)) calc(-0.5 * var(--box-grow)) 0;
 }
 
 .tile-img img {
@@ -234,17 +241,14 @@ html:not(.motion) .tile:hover { --s: 1.12; --swap: 1; }
 
 /* Hex positions (% of the .world square) */
 .tile.pos-t  { top: 1%;  left: 50%; translate: -50% 0; }             /* top center */
-.tile.pos-lu { top: 22%; left: 2%; }                                  /* left upper */
+.tile.pos-lu { top: 22%; left: 2%; --box-scale: calc(165 / 140); }    /* left upper; Lucille is tall and thin, so her box is 165 px where the others are 140 */
 .tile.pos-ru { top: 22%; right: 2%; }                                 /* right upper */
 .tile.pos-ll { top: 52%; left: 2%; }                                  /* left lower */
 .tile.pos-rl { top: 52%; right: 2%; }                                 /* right lower */
 .tile.pos-b  { bottom: 0%; left: 50%; translate: -50% 0; }          /* bottom center */
 
 @media (max-width: 480px) {
-  .tile-img {
-    width: clamp(50px, 18vw, 90px);
-    height: clamp(50px, 18vw, 90px);
-  }
+  .tile-img { --box-base: clamp(50px, 18vw, 90px); }
 }
 
 /* ── Back link (fixed, bottom center) ── */
