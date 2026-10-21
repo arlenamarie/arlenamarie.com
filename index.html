@@ -67,6 +67,12 @@
   @media (max-height: 480px) {
     .world { width: 90vh; height: 90vh; }
   }
+
+  /* Bottom tile lifted so the gap from the name to the can lid equals the gap
+     from the Follow label to the name (ink to ink). A percentage alone cannot
+     do it at every size, because labels and image boxes have pixel minimums;
+     fitted at 1280x800 (12 px up) and 390x844 (8.7 px up). */
+  .tile.pos-b { bottom: calc(0.883% + 5.5px); }
 </style>
 </head>
 <body>
