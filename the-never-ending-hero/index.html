@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE NEVER-ENDING HERO, Arlena Marie</title>
-<meta name="description" content="A quiet girl who lives in her head. The crown is where she already is. The root is where she has to arrive. Seven episodes, crown to root.">
+<meta name="description" content="A quiet girl who lives in her head. The crown is where she already is. The root is where she has to arrive. Seven episodes.">
  <link rel="icon" href="/favicon.ico" sizes="48x48">
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
@@ -44,6 +44,7 @@
     --stage-h: 620px;
     --point: 22px;
     --line: 150px;
+    --rows-w: 400px;   /* label column, wide enough for the longest realm row */
   }
 
   body {
@@ -84,7 +85,7 @@
   .ep-stage {
     position: relative;
     flex: none;
-    width: calc(var(--stage-w) / 2 + var(--point) / 2 + var(--line) + 8px + 330px);
+    width: calc(var(--stage-w) / 2 + var(--point) / 2 + var(--line) + 8px + var(--rows-w));
     height: var(--stage-h);
   }
   .ep-april {
@@ -145,7 +146,7 @@
     position: absolute;
     left: calc(var(--stage-w) / 2 + var(--point) / 2 + var(--line) + 8px);
     top: 0;
-    width: 330px;
+    width: var(--rows-w);
     height: 100%;
     text-align: left;
   }
@@ -170,14 +171,19 @@
   }
   .ep-row:focus-visible { outline: 2px dashed var(--accent); outline-offset: 3px; }
   .ep-dot { display: none; }
-  .ep-kicker {
+  /* Row label: "1 · The Overlook Forest" (number, then the realm) */
+  .ep-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .ep-num {
     font-family: 'Nunito', sans-serif;
     font-weight: 800;
     font-size: 12px;
     letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
-  .ep-title {
+  .ep-name {
     font-family: 'Caveat', cursive;
     font-weight: 500;
     font-size: 30px;
@@ -200,7 +206,7 @@
     position: relative;
     flex: none;
     width: 300px;
-    height: 316px;   /* fits the tallest face: episode 1 with its progress bar */
+    height: 270px;   /* fits the tallest face: episode 1 with its progress bar */
     background: #fff;
     border: 2px solid var(--ink);
     border-radius: 18px;
@@ -240,16 +246,11 @@
     text-transform: uppercase;
   }
   .ep-realm {
-    margin-top: 2px;
+    margin-top: 4px;
     font-family: 'Caveat', cursive;
     font-weight: 500;
-    font-size: 18px;
-    line-height: 1.2;
-  }
-  .ep-line-text {
-    margin-top: 6px;
-    font-size: 20px;
-    line-height: 1.15;
+    font-size: 26px;
+    line-height: 1.1;
   }
   .ep-progress {
     display: flex;
@@ -270,13 +271,6 @@
   .ep-progress-fill { height: 100%; background: #f5d985; }
 
   /* ── Below the group ── */
-  .ep-legend {
-    margin: 28px auto 0;
-    max-width: 1000px;
-    font-size: clamp(16px, 2.6vw, 22px);
-    opacity: 0.8;
-  }
-  .ep-legend span { white-space: nowrap; }   /* wrap between items, never inside one */
   .ep-foot {
     display: flex;
     flex-wrap: wrap;
@@ -329,7 +323,7 @@
       min-height: calc(7 * 72px);   /* reserved before episodes.json arrives (7 rows of 66 + 6) */
       margin: 20px auto 0;
     }
-    /* Same two-line grid for every row: dot | kicker over title | chip */
+    /* Same grid for every row: dot | label (may wrap to two lines) | chip */
     .ep-row {
       position: relative;
       top: auto;
@@ -339,9 +333,10 @@
       margin-bottom: 6px;
       display: grid;
       grid-template-columns: 16px 1fr auto;
-      grid-template-areas: "dot kicker chip" "dot title chip";
-      align-content: center;
-      gap: 2px 12px;
+      grid-template-areas: "dot label chip";
+      align-items: center;
+      gap: 12px;
+      white-space: normal;
     }
     .ep-dot {
       grid-area: dot;
@@ -353,9 +348,10 @@
       border: 2px solid var(--ink);
       background: var(--c);
     }
-    .ep-kicker { grid-area: kicker; }
-    .ep-title { grid-area: title; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-    .ep-chip { grid-area: chip; align-self: center; }
+    .ep-label { grid-area: label; display: block; min-width: 0; }
+    .ep-num { margin-right: 6px; }
+    .ep-name { font-size: 26px; }
+    .ep-chip { grid-area: chip; }
     .ep-panel {
       margin: 0 0 12px;
       padding: 14px;
@@ -386,8 +382,6 @@
       <div class="ep-rows" id="epRows"></div>
     </div>
   </div>
-
-  <p class="ep-legend"><span>1 Crown receive</span> · <span>2 Third eye see clearly</span> · <span>3 Throat say it</span> · <span>4 Heart forgive</span> · <span>5 Solar plexus stand</span> · <span>6 Sacral make, feel</span> · <span>7 Root land</span></p>
 
   <div class="ep-foot">
     <a href="/" class="back">← back home</a>
@@ -448,7 +442,8 @@ const el = (tag, cls, text) => {
   return e;
 };
 
-// One card face: keyframe (or a dashed placeholder), "N · CHAKRA · STATUS", the realm, the line, progress
+// One card face: keyframe (or a dashed placeholder), "EPISODE N · STATUS", the realm, progress.
+// chakra, title and line stay in episodes.json but are not shown (they can come back later).
 function face(ep) {
   const f = el('div', 'ep-face');
   if (ep.keyframe) {
@@ -459,9 +454,8 @@ function face(ep) {
   } else {
     f.append(el('div', 'ep-key-frame empty', 'keyframe soon'));
   }
-  f.append(el('p', 'ep-meta', `${ep.n} · ${ep.chakra} · ${STATUS[ep.status].label}`));
+  f.append(el('p', 'ep-meta', `Episode ${ep.n} · ${STATUS[ep.status].label}`));
   if (ep.realm) f.append(el('p', 'ep-realm', ep.realm));
-  f.append(el('p', 'ep-line-text', ep.line));
   if (ep.progress != null) {
     const p = el('div', 'ep-progress');
     const bar = el('div', 'ep-progress-bar');
@@ -504,7 +498,9 @@ function render(episodes) {
     row.style.setProperty('--c', c);
     const chip = el('span', 'ep-chip', STATUS[ep.status].label);
     chip.style.setProperty('--chip', STATUS[ep.status].fill);
-    row.append(el('span', 'ep-dot'), el('span', 'ep-kicker', `${ep.n} · ${ep.chakra}`), el('span', 'ep-title', ep.title), chip);
+    const label = el('span', 'ep-label');
+    label.append(el('span', 'ep-num', `${ep.n} ·`), el('span', 'ep-name', ep.realm));
+    row.append(el('span', 'ep-dot'), label, chip);
     row.setAttribute('aria-controls', `ep-panel-${ep.n}`);
 
     const panel = el('div', 'ep-panel');
