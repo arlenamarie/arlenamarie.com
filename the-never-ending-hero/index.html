@@ -4,37 +4,323 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE HERO, Arlena Marie</title>
-<meta name="description" content="she's gaining her strength...">
+<meta name="description" content="she's gaining her strength... Seven episodes, crown to root.">
  <link rel="icon" href="/favicon.ico" sizes="48x48">
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-brush-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/nunito-latin-800.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=ce2efe8">
 <style>
+  /* ── Episode page ──
+     Desktop (720 px and up): card | April with seven points and leader lines | seven label rows.
+     The stage is a fixed 360x620 figure; points sit on her center line (x 180),
+     crown at y 20, then every 90 px down to root at y 560. Rows line up with
+     their points. Under 720 px the columns stack and a tapped row opens its
+     card inline beneath it. Per-episode highlight (0 to 1) is --h on the
+     point, line and row; the page's script tweens it. */
+  :root {
+    --accent: #c8553d;
+    --stage-w: 360px;
+    --stage-h: 620px;
+    --point: 22px;
+    --line: 150px;
+  }
+
   body {
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    color:var(--ink);
-    text-align:center; padding:2rem;
+    color: var(--ink);
+    text-align: center;
+    padding: 32px 16px 40px;
   }
+  .content { position: relative; z-index: 1; }
+
   .page-name {
-    font-family:'Caveat Brush',cursive;
-    font-size:clamp(40px,10vw,72px);
-    line-height:1.1; margin-bottom:0.5rem;
+    font-family: 'Caveat Brush', cursive;
+    font-weight: 400;
+    font-size: clamp(40px, 10vw, 72px);
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
   }
-  .tagline {
-    font-size:clamp(18px,4vw,28px);
-    opacity:0.75; margin-bottom:2rem;
+  .logline {
+    font-size: clamp(18px, 4vw, 28px);
+    opacity: 0.75;
+  }
+
+  /* ── The group: card, April, rows ── */
+  .ep-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 24px 40px;
+    margin: 28px auto 0;
+  }
+
+  .ep-stage {
+    position: relative;
+    flex: none;
+    width: calc(var(--stage-w) / 2 + var(--point) / 2 + var(--line) + 8px + 330px);
+    height: var(--stage-h);
+  }
+  .ep-april {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--stage-w);
+    height: var(--stage-h);
+  }
+  .ep-april img { display: block; width: 100%; height: 100%; }
+
+  /* Point and leader line for one episode, on April's center line */
+  .ep-mark {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--y) / 620 * 100%);
+    --h: 0;
+    pointer-events: none;
+  }
+  .ep-point {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--point) + 16px * var(--h));
+    height: calc(var(--point) + 16px * var(--h));
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: var(--c);
+    border: 2px solid var(--ink);
+    box-shadow:
+      0 0 0 calc(3px * var(--h)) var(--accent),
+      0 0 calc(8px * var(--h)) calc(3px * var(--h)) color-mix(in srgb, var(--accent) calc(var(--h) * 55%), transparent);
+    z-index: 2;
+  }
+  .ep-line {
+    position: absolute;
+    left: calc(var(--point) / 2);
+    top: 0;
+    width: var(--line);
+    height: calc(1.5px + 1.5px * var(--h));
+    translate: 0 -50%;
+    transform-origin: left center;
+    background: color-mix(in srgb, var(--accent) calc(var(--h) * 100%), color-mix(in srgb, var(--ink) 45%, transparent));
+    z-index: 1;
+  }
+
+  /* Label rows: absolute on desktop, one per point */
+  .ep-rows {
+    position: absolute;
+    left: calc(var(--stage-w) / 2 + var(--point) / 2 + var(--line) + 8px);
+    top: 0;
+    width: 330px;
+    height: 100%;
+    text-align: left;
+  }
+  .ep-row {
+    --h: 0;
+    position: absolute;
+    left: 0;
+    top: calc(var(--y) / 620 * 100%);
+    translate: 0 -50%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 2px solid color-mix(in srgb, var(--ink) calc(var(--h) * 100%), transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, #fff calc(var(--h) * 100%), transparent);
+  }
+  .ep-row:focus-visible { outline: 2px dashed var(--accent); outline-offset: 3px; }
+  .ep-dot { display: none; }
+  .ep-kicker {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .ep-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1;
+  }
+  .ep-chip {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--chip, transparent);
+  }
+  .ep-panel { display: none; }
+
+  /* ── Card: one face per episode, stacked; the shown face has opacity 1 ── */
+  .ep-card {
+    position: relative;
+    flex: none;
+    width: 300px;
+    height: 300px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    text-align: left;
+  }
+  .ep-face {
+    position: absolute;
+    inset: 14px;
+    opacity: 0;
+  }
+  .ep-face.shown { opacity: 1; }
+  .ep-panel .ep-face { position: static; opacity: 1; }
+  .ep-key-frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .ep-key-frame.empty {
+    display: grid;
+    place-items: center;
+    border: 2px dashed color-mix(in srgb, var(--ink) 40%, transparent);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+  .ep-meta {
+    margin-top: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .ep-line-text {
+    margin-top: 6px;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+  .ep-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+  }
+  .ep-progress-bar {
+    flex: 1;
+    height: 12px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .ep-progress-fill { height: 100%; background: #f5d985; }
+
+  /* ── Below the group ── */
+  .ep-legend {
+    margin: 28px auto 0;
+    max-width: 1000px;
+    font-size: clamp(16px, 2.6vw, 22px);
+    opacity: 0.8;
+  }
+  .ep-legend span { white-space: nowrap; }   /* wrap between items, never inside one */
+  .ep-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px 28px;
+    margin-top: 18px;
   }
   .back {
-    font-size:clamp(16px,3vw,20px);
-    color:var(--ink); text-decoration:none;
-    opacity:0.6; transition:opacity 0.2s;
+    font-size: clamp(16px, 3vw, 20px);
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
   }
-  .back:hover { opacity:1; }
-  .content { position:relative; z-index:1; }
+  .back:hover { opacity: 1; }
+  .pill {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 7px 16px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: #fff;
+  }
+  .pill:hover { background: #f4b6c2; }
+  .ep-error { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; }
+
+  /* ── Phone: stack April, then the rows; tap a row to open its card inline ── */
+  @media (max-width: 719px) {
+    .ep-group { flex-direction: column; gap: 20px; }
+    .ep-card { display: none; }
+    .ep-stage { width: 100%; height: auto; }
+    .ep-april {
+      position: relative;
+      width: min(var(--stage-w), 100%);
+      height: auto;
+      aspect-ratio: 360 / 620;
+      margin: 0 auto;
+    }
+    .ep-line { display: none; }
+    .ep-rows {
+      position: static;
+      width: min(440px, 100%);
+      height: auto;
+      min-height: calc(7 * 62px);   /* reserved before episodes.json arrives */
+      margin: 20px auto 0;
+    }
+    .ep-row {
+      position: relative;
+      top: auto;
+      translate: none;
+      width: 100%;
+      min-height: 56px;
+      margin-bottom: 6px;
+      white-space: normal;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+    }
+    .ep-dot {
+      display: block;
+      flex: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      background: var(--c);
+    }
+    .ep-title { flex: 1; min-width: 6ch; }
+    .ep-panel {
+      margin: 0 0 12px;
+      padding: 14px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      text-align: left;
+    }
+    .ep-panel.open { display: block; }
+  }
 </style>
 </head>
 <body>
@@ -43,23 +329,38 @@
 <div class="orbit-anchor"><div class="orbit-ring" id="orbitRing"></div></div>
 
 <div class="content">
-  <div class="page-name" id="pageName"></div>
-  <p class="tagline">she's gaining her strength...</p>
-  <a href="/" class="back">← back home</a>
+  <h1 class="page-name" id="pageName" aria-label="The Hero"></h1>
+  <p class="logline">she's gaining her strength...</p>
+
+  <div class="ep-group" id="epGroup">
+    <section class="ep-card" id="epCard" aria-live="polite" aria-label="Episode"></section>
+    <div class="ep-stage">
+      <div class="ep-april" id="epApril">
+        <img src="/images/april-placeholder.svg" width="360" height="620" alt="">
+      </div>
+      <div class="ep-rows" id="epRows"></div>
+    </div>
+  </div>
+
+  <p class="ep-legend"><span>1 Crown receive</span> · <span>2 Third eye see clearly</span> · <span>3 Throat say it</span> · <span>4 Heart forgive</span> · <span>5 Solar plexus stand</span> · <span>6 Sacral make, feel</span> · <span>7 Root land</span></p>
+
+  <div class="ep-foot">
+    <a href="/" class="back">← back home</a>
+    <a href="/about" class="pill">contact</a>
+  </div>
 </div>
 
 </main>
 
 <script src="/assets/site.js?v=1839412"></script>
 <script>
-/* ── Page config: stub page (about, bar-art, drinks-at-the-bar, the-never-ending-hero) ── */
+/* ── Page config: The Never-Ending Hero ── */
 Site.title(document.getElementById('pageName'), 'THE HERO', {
   step: 0.13, rot: '5deg', lift: '3px', spd: '2.4s',
   space: { html: '&nbsp;', width: '0.3em', animate: true },
 });
 
-/* 8 stars, ellipse 35% of the shorter viewport side by 85% of that, sized 14 to 36 px.
-   Positions are set once at load (no resize relayout), as before. */
+/* 8 stars, ellipse 35% of the shorter viewport side by 85% of that, sized 14 to 36 px */
 const r = Math.min(window.innerWidth, window.innerHeight) * 0.35;
 Site.orbit(document.getElementById('orbitRing'), {
   count: 8,
@@ -73,6 +374,106 @@ Site.orbit(document.getElementById('orbitRing'), {
   radius: () => ({ rx: r, ry: r * 0.85 }),
   relayout: false,
 });
+
+/* ── Episodes ──
+   Rendered from episodes.json at load. Points run crown (1, top) to root (7),
+   90 px apart on April's center line, in these colors. */
+const COLORS = ['#d4c5e8', '#c9b8e6', '#a8d8ea', '#b8e0d2', '#f5d985', '#f5a896', '#f4b6c2'];
+const FIRST_Y = 20, STEP_Y = 90;          // px in the 360x620 figure
+const DEFAULT_EP = 4;                     // shown in the card on load
+const STATUS = {
+  'finished':       { label: 'Finished',       fill: '#b8e0d2' },
+  'in-the-works':   { label: 'In the works',   fill: '#f5d985' },
+  'next-up':        { label: 'Next up',        fill: '#f4b6c2' },
+  'on-the-horizon': { label: 'On the horizon', fill: 'transparent' },
+};
+
+const el = (tag, cls, text) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+};
+
+// One card face: keyframe (or a dashed placeholder), "N · CHAKRA · STATUS", the line, progress
+function face(ep) {
+  const f = el('div', 'ep-face');
+  if (ep.keyframe) {
+    const img = el('img', 'ep-key-frame');
+    img.src = ep.keyframe;
+    img.alt = `Episode ${ep.n} keyframe`;
+    f.append(img);
+  } else {
+    f.append(el('div', 'ep-key-frame empty', 'keyframe soon'));
+  }
+  f.append(el('p', 'ep-meta', `${ep.n} · ${ep.chakra} · ${STATUS[ep.status].label}`));
+  f.append(el('p', 'ep-line-text', ep.line));
+  if (ep.progress != null) {
+    const p = el('div', 'ep-progress');
+    const bar = el('div', 'ep-progress-bar');
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-valuenow', ep.progress);
+    bar.setAttribute('aria-valuemin', 0);
+    bar.setAttribute('aria-valuemax', 100);
+    bar.setAttribute('aria-label', `Episode ${ep.n} progress`);
+    const fill = el('div', 'ep-progress-fill');
+    fill.style.width = `${ep.progress}%`;
+    bar.append(fill);
+    p.append(bar, el('span', '', `${ep.progress}%`));
+    f.append(p);
+  }
+  return f;
+}
+
+function render(episodes) {
+  const april = document.getElementById('epApril');
+  const rows = document.getElementById('epRows');
+  const card = document.getElementById('epCard');
+  const out = {};
+  episodes.forEach(ep => {
+    const y = FIRST_Y + (ep.n - 1) * STEP_Y;
+    const c = COLORS[ep.n - 1];
+
+    const mark = el('div', 'ep-mark');
+    mark.setAttribute('aria-hidden', 'true');
+    mark.style.setProperty('--y', y);
+    mark.style.setProperty('--c', c);
+    const point = el('span', 'ep-point');
+    const line = el('span', 'ep-line');
+    mark.append(line, point);
+    april.append(mark);
+
+    const row = el('button', 'ep-row');
+    row.type = 'button';
+    row.dataset.n = ep.n;
+    row.style.setProperty('--y', y);
+    row.style.setProperty('--c', c);
+    const chip = el('span', 'ep-chip', STATUS[ep.status].label);
+    chip.style.setProperty('--chip', STATUS[ep.status].fill);
+    row.append(el('span', 'ep-dot'), el('span', 'ep-kicker', `${ep.n} · ${ep.chakra}`), el('span', 'ep-title', ep.title), chip);
+    row.setAttribute('aria-controls', `ep-panel-${ep.n}`);
+
+    const panel = el('div', 'ep-panel');
+    panel.id = `ep-panel-${ep.n}`;
+    panel.append(face(ep));
+    rows.append(row, panel);
+
+    const f = face(ep);
+    if (ep.n === DEFAULT_EP) f.classList.add('shown');
+    card.append(f);
+
+    out[ep.n] = { ep, mark, point, line, row, panel, face: f };
+  });
+  return out;
+}
+
+const episodes = fetch('episodes.json')
+  .then(res => { if (!res.ok) throw new Error(`episodes.json: ${res.status}`); return res.json(); })
+  .then(render)
+  .catch(() => {
+    document.getElementById('epRows').append(el('p', 'ep-error', 'The episodes did not load. Please refresh.'));
+    return null;
+  });
 </script>
 </body>
 </html>
