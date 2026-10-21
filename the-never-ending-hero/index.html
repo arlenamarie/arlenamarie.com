@@ -14,6 +14,12 @@
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/nunito-latin-800.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=ce2efe8">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script>
+  /* Intro starting state: title letters, logline, points, leader lines, labels
+     and card hidden until the GSAP timeline reveals them (.intro rules below).
+     Skipped for reduced motion: the page starts in its final layout instead. */
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro');
+</script>
 <style>
   /* ── Episode page ──
      Desktop (720 px and up): card | April with seven points and leader lines | seven label rows.
@@ -95,6 +101,7 @@
     box-shadow:
       0 0 0 calc(3px * var(--h)) var(--accent),
       0 0 calc(8px * var(--h)) calc(3px * var(--h)) color-mix(in srgb, var(--accent) calc(var(--h) * 55%), transparent);
+    scale: var(--pop, 1);   /* intro pop; a variable, so GSAP never takes over translate */
     z-index: 2;
   }
   .ep-line {
@@ -104,10 +111,18 @@
     width: var(--line);
     height: calc(1.5px + 1.5px * var(--h));
     translate: 0 -50%;
+    scale: var(--draw, 1) 1;   /* intro draw, left to right */
     transform-origin: left center;
     background: color-mix(in srgb, var(--accent) calc(var(--h) * 100%), color-mix(in srgb, var(--ink) 45%, transparent));
     z-index: 1;
   }
+
+  /* Intro starting state (html.intro; removed when the intro ends, or by
+     site.js if GSAP has not arrived within 3 s) */
+  .intro .logline,
+  .intro .ep-row,
+  .intro .ep-card { opacity: 0; }
+  .intro .ep-mark { --pop: 0; --draw: 0; }
 
   /* Label rows: absolute on desktop, one per point */
   .ep-rows {
@@ -356,9 +371,10 @@
 <script src="/assets/site.js?v=1839412"></script>
 <script>
 /* ── Page config: The Never-Ending Hero ── */
+/* Letters are animated by GSAP below (intro, then idle wiggle), as on the homepage */
 Site.title(document.getElementById('pageName'), 'THE HERO', {
-  step: 0.13, rot: '5deg', lift: '3px', spd: '2.4s',
-  space: { html: '&nbsp;', width: '0.3em', animate: true },
+  driver: 'gsap',
+  space: { html: '&nbsp;', width: '0.3em' },
 });
 
 /* 8 stars, ellipse 35% of the shorter viewport side by 85% of that, sized 14 to 36 px */
@@ -543,8 +559,42 @@ episodes.then(items => {
   apply();
 });
 
-/* GSAP drives the hover tweens (and, below, the intro) */
-Site.motion(() => {});
+/* ── Intro and idle motion ──
+   Title letters and logline as on the homepage; then the seven points pop in
+   crown to root (0.06 s stagger, back.out); then the leader lines draw left to
+   right; then the labels and the card fade in. The timeline waits for
+   episodes.json. Reduced motion drops the intro only (html.intro is never
+   set): the page starts in its final layout, and the letter wiggle, hover and
+   tap still run. */
+Site.motion((gsap, { intro }) => {
+  const letters = gsap.utils.toArray('#pageName .wiggle-letter');
+  const ease = 'back.out(1.7)';
+
+  // Idle wiggle: -5deg to 5deg and up 3 px and back, 2.4 s per cycle
+  // Registered with Site.loop so a back/forward cache restore can resume it
+  const wiggle = el => Site.loop(gsap.fromTo(el, { rotation: -5, y: 0 },
+    { rotation: 5, y: -3, duration: 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true }));
+
+  if (!intro) { letters.forEach(wiggle); return; }
+
+  // Registered with Site.intro so a back/forward cache restore finishes it instead of replaying
+  const tl = Site.intro(gsap.timeline({ onComplete: () => document.documentElement.classList.remove('intro') }));
+  tl.fromTo(letters, { opacity: 0, y: 18, scale: 0.7, rotation: -5 }, {
+      opacity: 1, y: 0, scale: 1, rotation: -5, duration: 0.5, ease,
+      stagger: { each: 0.08, onComplete() { wiggle(this.targets()[0]); } },
+    }, 0)
+    .fromTo('.logline', { opacity: 0 }, { opacity: 0.75, duration: 0.5 }, 0.3);
+
+  episodes.then(items => {
+    // No data, or it came after the title finished: the page is already in its final layout
+    if (!items || tl.progress() === 1) return;
+    const eps = Object.values(items).sort((a, b) => a.ep.n - b.ep.n);   // crown to root
+    const marks = eps.map(e => e.mark);
+    tl.fromTo(marks, { '--pop': 0 }, { '--pop': 1, duration: 0.45, ease, stagger: 0.06 }, 0.9)
+      .fromTo(marks, { '--draw': 0 }, { '--draw': 1, duration: 0.35, ease: 'power2.out', stagger: 0.06 }, '>-0.1')
+      .fromTo([...eps.map(e => e.row), '#epCard'], { opacity: 0 }, { opacity: 1, duration: 0.35, stagger: 0.06 }, '>-0.15');
+  });
+});
 </script>
 </body>
 </html>
