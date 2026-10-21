@@ -13,6 +13,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caveat-brush-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/nunito-latin-800.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=ce2efe8">
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
   /* ── Episode page ──
      Desktop (720 px and up): card | April with seven points and leader lines | seven label rows.
@@ -474,6 +475,76 @@ const episodes = fetch('episodes.json')
     document.getElementById('epRows').append(el('p', 'ep-error', 'The episodes did not load. Please refresh.'));
     return null;
   });
+
+/* ── Interaction ──
+   Desktop (720 px and up, side card): hovering a row, or reaching it with the
+   keyboard, lights its point, line and label (--h to 1) and cross-fades the
+   card to that episode in 0.25 s; leaving returns to episode 4 with nothing
+   lit. A touch tap on the desktop layout picks a row until another is picked.
+   Phone (under 720 px): no hover; tapping a row opens its card inline beneath
+   it (one open at a time) and lights its point.
+   Every event recomputes the whole state and retargets one quickTo per value,
+   as Site.hover does, so rapid moves can never leave anything half lit.
+   Without gsap the same values are set instantly. */
+const phone = matchMedia('(max-width: 719px)');
+
+episodes.then(items => {
+  if (!items) return;
+  const eps = Object.values(items);
+  let hovered = null, focused = null, picked = null, open = null, lastType = '';
+
+  const quick = new Map();
+  const to = (target, prop, value) => {
+    const gsap = window.gsap;
+    if (!gsap) { target.style.setProperty(prop, value); return; }
+    const key = quick.get(target) || {};
+    if (!key[prop]) {
+      gsap.set(target, { [prop]: getComputedStyle(target).getPropertyValue(prop) || 0 });
+      key[prop] = gsap.quickTo(target, prop, { duration: 0.25, ease: 'power2.out' });
+      quick.set(target, key);
+    }
+    key[prop](value);
+  };
+
+  const apply = () => {
+    const desk = !phone.matches;
+    const lit = desk ? (hovered ?? focused ?? picked) : open;
+    const shown = lit ?? DEFAULT_EP;
+    eps.forEach(({ ep, mark, row, panel, face }) => {
+      const h = ep.n === lit ? 1 : 0;
+      to(mark, '--h', h);
+      to(row, '--h', h);
+      to(face, 'opacity', ep.n === shown ? 1 : 0);
+      panel.classList.toggle('open', !desk && ep.n === open);
+      if (desk) { row.removeAttribute('aria-expanded'); row.setAttribute('aria-controls', 'epCard'); }
+      else { row.setAttribute('aria-expanded', String(ep.n === open)); row.setAttribute('aria-controls', panel.id); }
+    });
+  };
+
+  eps.forEach(({ ep, row }) => {
+    const n = ep.n;
+    row.addEventListener('pointerdown', e => { lastType = e.pointerType; });
+    row.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') { hovered = n; apply(); } });
+    row.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && hovered === n) { hovered = null; apply(); } });
+    row.addEventListener('pointercancel', () => { if (hovered === n) { hovered = null; apply(); } });
+    row.addEventListener('focus', () => { if (row.matches(':focus-visible')) { focused = n; apply(); } });
+    row.addEventListener('blur', () => { if (focused === n) { focused = null; apply(); } });
+    row.addEventListener('click', e => {
+      if (phone.matches) { open = open === n ? null : n; apply(); return; }
+      if ((e.pointerType || lastType) === 'touch') { picked = picked === n ? null : n; apply(); }
+    });
+  });
+
+  // The card faces start from their class; from here on the tweens own opacity
+  eps.forEach(({ face }) => { face.style.opacity = face.classList.contains('shown') ? 1 : 0; face.classList.remove('shown'); });
+  phone.addEventListener('change', () => { hovered = focused = picked = open = null; apply(); });
+  // Back/forward cache restores the page as it was left; the pointer has moved since
+  window.addEventListener('pageshow', e => { if (e.persisted) { hovered = picked = null; apply(); } });
+  apply();
+});
+
+/* GSAP drives the hover tweens (and, below, the intro) */
+Site.motion(() => {});
 </script>
 </body>
 </html>
