@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 620" width="360" height="620">
+  <!-- Placeholder for April (The Never-Ending Hero) until a drawing replaces it.
+       Seated, legs crossed. Her center line is x = 180: crown at y = 20 (top of
+       the head), root at y = 560 (the seat); the page puts the seven points
+       90 px apart between them. -->
+  <defs>
+    <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8aecb"/>
+      <stop offset="1" stop-color="#8f84a6"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.6" stop-color="#3b2f55" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3b2f55" stop-opacity="0.22"/>
+    </linearGradient>
+    <g id="figure">
+      <!-- legs, crossed -->
+      <path d="M20 560C20 522 80 498 180 500C280 498 340 522 340 560C340 594 280 608 180 606C80 608 20 594 20 560Z"/>
+      <!-- torso -->
+      <path d="M120 222C90 222 70 240 70 275L92 420C96 470 104 505 112 530L248 530C256 505 264 470 268 420L290 275C290 240 270 222 240 222Z"/>
+      <!-- arms, hands resting on the knees -->
+      <path d="M74 258C52 330 44 422 66 498C74 522 102 528 112 508C98 452 98 362 108 298Z"/>
+      <path d="M286 258C308 330 316 422 294 498C286 522 258 528 248 508C262 452 262 362 252 298Z"/>
+      <!-- neck -->
+      <rect x="157" y="168" width="46" height="62" rx="18"/>
+      <!-- head -->
+      <circle cx="180" cy="105" r="85"/>
+    </g>
+  </defs>
+  <ellipse cx="180" cy="607" rx="150" ry="10" fill="#8f84a6" opacity="0.25"/>
+  <use href="#figure" fill="url(#fill)"/>
+  <use href="#figure" fill="url(#shade)"/>
+</svg>
