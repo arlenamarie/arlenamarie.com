@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE HERO, Arlena Marie</title>
-<meta name="description" content="she's gaining her strength... Seven episodes, crown to root.">
+<title>THE NEVER-ENDING HERO, Arlena Marie</title>
+<meta name="description" content="A quiet girl who lives in her head. The crown is where she already is. The root is where she has to arrive. Seven episodes, crown to root.">
  <link rel="icon" href="/favicon.ico" sizes="48x48">
  <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
  <link rel="icon" href="/images/favicon-192.png" type="image/png" sizes="192x192">
@@ -14,6 +14,16 @@
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/nunito-latin-800.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=ce2efe8">
 <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script>
+  /* Content stays unpainted until Caveat, Caveat Brush and Nunito are ready (at most
+     3 s): in a fallback font the long title and logline wrap to more lines, and the
+     swap would move April's whole group up (a layout shift). */
+  document.documentElement.classList.add('fonts-pending');
+  Promise.race([
+    Promise.all(["400 1em 'Caveat Brush'", "500 1em 'Caveat'", "800 1em 'Nunito'"].map(f => document.fonts.load(f))),
+    new Promise(r => setTimeout(r, 3000)),
+  ]).finally(() => document.documentElement.classList.remove('fonts-pending'));
+</script>
 <script>
   /* Intro starting state: title letters, logline, points, leader lines, labels
      and card hidden until the GSAP timeline reveals them (.intro rules below).
@@ -42,6 +52,7 @@
     padding: 32px 16px 40px;
   }
   .content { position: relative; z-index: 1; }
+  .fonts-pending .content { visibility: hidden; }   /* see the fonts-pending script in <head> */
 
   .page-name {
     font-family: 'Caveat Brush', cursive;
@@ -50,8 +61,13 @@
     line-height: 1.1;
     margin-bottom: 0.25rem;
   }
+  /* One no-wrap group per word: the title wraps between words, never inside one */
+  .page-word { display: inline-block; white-space: nowrap; }
   .logline {
+    max-width: 760px;
+    margin: 0 auto;
     font-size: clamp(18px, 4vw, 28px);
+    line-height: 1.25;
     opacity: 0.75;
   }
 
@@ -184,7 +200,7 @@
     position: relative;
     flex: none;
     width: 300px;
-    height: 300px;
+    height: 316px;   /* fits the tallest face: episode 1 with its progress bar */
     background: #fff;
     border: 2px solid var(--ink);
     border-radius: 18px;
@@ -223,10 +239,17 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
+  .ep-realm {
+    margin-top: 2px;
+    font-family: 'Caveat', cursive;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1.2;
+  }
   .ep-line-text {
     margin-top: 6px;
-    font-size: 26px;
-    line-height: 1.1;
+    font-size: 20px;
+    line-height: 1.15;
   }
   .ep-progress {
     display: flex;
@@ -303,30 +326,36 @@
       position: static;
       width: min(440px, 100%);
       height: auto;
-      min-height: calc(7 * 62px);   /* reserved before episodes.json arrives */
+      min-height: calc(7 * 72px);   /* reserved before episodes.json arrives (7 rows of 66 + 6) */
       margin: 20px auto 0;
     }
+    /* Same two-line grid for every row: dot | kicker over title | chip */
     .ep-row {
       position: relative;
       top: auto;
       translate: none;
       width: 100%;
-      min-height: 56px;
+      height: 66px;
       margin-bottom: 6px;
-      white-space: normal;
-      flex-wrap: wrap;
-      gap: 4px 10px;
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      grid-template-areas: "dot kicker chip" "dot title chip";
+      align-content: center;
+      gap: 2px 12px;
     }
     .ep-dot {
+      grid-area: dot;
+      align-self: center;
       display: block;
-      flex: none;
       width: 16px;
       height: 16px;
       border-radius: 50%;
       border: 2px solid var(--ink);
       background: var(--c);
     }
-    .ep-title { flex: 1; min-width: 6ch; }
+    .ep-kicker { grid-area: kicker; }
+    .ep-title { grid-area: title; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .ep-chip { grid-area: chip; align-self: center; }
     .ep-panel {
       margin: 0 0 12px;
       padding: 14px;
@@ -345,8 +374,8 @@
 <div class="orbit-anchor"><div class="orbit-ring" id="orbitRing"></div></div>
 
 <div class="content">
-  <h1 class="page-name" id="pageName" aria-label="The Hero"></h1>
-  <p class="logline">she's gaining her strength...</p>
+  <h1 class="page-name" id="pageName" aria-label="The Never-Ending Hero"></h1>
+  <p class="logline">A quiet girl who lives in her head. The crown is where she already is. The root is where she has to arrive.</p>
 
   <div class="ep-group" id="epGroup">
     <section class="ep-card" id="epCard" aria-live="polite" aria-label="Episode"></section>
@@ -371,11 +400,18 @@
 <script src="/assets/site.js?v=1839412"></script>
 <script>
 /* ── Page config: The Never-Ending Hero ── */
-/* Letters are animated by GSAP below (intro, then idle wiggle), as on the homepage */
-Site.title(document.getElementById('pageName'), 'THE HERO', {
-  driver: 'gsap',
-  space: { html: '&nbsp;', width: '0.3em' },
-});
+/* Letters are animated by GSAP below (intro, then idle wiggle), as on the homepage.
+   Each word is its own no-wrap group, so a narrow screen wraps between words. */
+{
+  const name = document.getElementById('pageName');
+  'THE NEVER-ENDING HERO'.split(' ').forEach((word, i) => {
+    if (i) name.append(' ');
+    const w = document.createElement('span');
+    w.className = 'page-word';
+    name.append(w);
+    Site.title(w, word, { driver: 'gsap' });
+  });
+}
 
 /* 8 stars, ellipse 35% of the shorter viewport side by 85% of that, sized 14 to 36 px */
 const r = Math.min(window.innerWidth, window.innerHeight) * 0.35;
@@ -397,7 +433,7 @@ Site.orbit(document.getElementById('orbitRing'), {
    90 px apart on April's center line, in these colors. */
 const COLORS = ['#d4c5e8', '#c9b8e6', '#a8d8ea', '#b8e0d2', '#f5d985', '#f5a896', '#f4b6c2'];
 const FIRST_Y = 20, STEP_Y = 90;          // px in the 360x620 figure
-const DEFAULT_EP = 4;                     // shown in the card on load
+const DEFAULT_EP = 1;                     // shown in the card on load (the one in the works)
 const STATUS = {
   'finished':       { label: 'Finished',       fill: '#b8e0d2' },
   'in-the-works':   { label: 'In the works',   fill: '#f5d985' },
@@ -412,7 +448,7 @@ const el = (tag, cls, text) => {
   return e;
 };
 
-// One card face: keyframe (or a dashed placeholder), "N · CHAKRA · STATUS", the line, progress
+// One card face: keyframe (or a dashed placeholder), "N · CHAKRA · STATUS", the realm, the line, progress
 function face(ep) {
   const f = el('div', 'ep-face');
   if (ep.keyframe) {
@@ -424,6 +460,7 @@ function face(ep) {
     f.append(el('div', 'ep-key-frame empty', 'keyframe soon'));
   }
   f.append(el('p', 'ep-meta', `${ep.n} · ${ep.chakra} · ${STATUS[ep.status].label}`));
+  if (ep.realm) f.append(el('p', 'ep-realm', ep.realm));
   f.append(el('p', 'ep-line-text', ep.line));
   if (ep.progress != null) {
     const p = el('div', 'ep-progress');
