@@ -1,0 +1,9 @@
+[
+  { "n": 1, "chakra": "Crown", "title": "[TITLE]", "status": "finished", "line": "[One line]", "keyframe": null, "progress": null },
+  { "n": 2, "chakra": "Third eye", "title": "[TITLE]", "status": "finished", "line": "[One line]", "keyframe": null, "progress": null },
+  { "n": 3, "chakra": "Throat", "title": "[TITLE]", "status": "finished", "line": "[One line]", "keyframe": null, "progress": null },
+  { "n": 4, "chakra": "Heart", "title": "[TITLE]", "status": "in-the-works", "line": "[One line]", "keyframe": null, "progress": 60 },
+  { "n": 5, "chakra": "Solar plexus", "title": "[TITLE]", "status": "next-up", "line": "[One line]", "keyframe": null, "progress": null },
+  { "n": 6, "chakra": "Sacral", "title": "[TITLE]", "status": "on-the-horizon", "line": "[One line]", "keyframe": null, "progress": null },
+  { "n": 7, "chakra": "Root", "title": "[TITLE]", "status": "on-the-horizon", "line": "[One line]", "keyframe": null, "progress": null }
+]
